@@ -72,7 +72,7 @@ abstract class Feature extends TreeNode {
         super(lineNumber);
     }
     public abstract void dump_with_types(PrintStream out, int n);
-
+    
 }
 
 
@@ -286,7 +286,11 @@ class programc extends Program {
       * @see CgenClassTable
       * */
     public void cgen(PrintStream s) {
+
+    // if you want to print out comments use #
+
 	CgenClassTable codegen_classtable = new CgenClassTable(classes, s);
+    codegen_classtable.code(s);
     }
 
 }
@@ -345,6 +349,13 @@ class class_c extends Class_ {
     public AbstractSymbol getFilename() { return filename; }
     public Features getFeatures()       { return features; }
 
+    public void code(Printstream s) {
+        for (Enumeration e = features.getElements(); e.hasMoreElements(); ) {
+            Feature curr_feat = (Feature) e.nextElement();
+            curr_feat.code(s);
+        }
+    }
+
 }
 
 
@@ -393,7 +404,9 @@ class method extends Feature {
         dump_AbstractSymbol(out, n + 2, return_type);
 	expr.dump_with_types(out, n + 2);
     }
-
+    
+    public void code(Printstream s) {
+        for (Enumeration e = 
 }
 
 
