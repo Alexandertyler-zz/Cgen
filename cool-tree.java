@@ -289,8 +289,13 @@ class programc extends Program {
 
     // if you want to print out comments use #
 
-	CgenClassTable codegen_classtable = new CgenClassTable(classes, s);
-    codegen_classtable.code(s);
+	   CgenClassTable cgTable = new CgenClassTable(classes, s);
+       SymbolTable sTable = new SymbolTable();
+        cgTable.code(s);
+        for (Enumeration e = classes.getElements(); e.hasMoreElements(); ) {
+            curr_class = (class_c) e.nextElement();
+            curr_class.code(s, curr_class, cgTable, sTable)
+        }
     }
 
 }
@@ -349,10 +354,12 @@ class class_c extends Class_ {
     public AbstractSymbol getFilename() { return filename; }
     public Features getFeatures()       { return features; }
 
-    public void code(Printstream s) {
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        sTable.enterScope();
+
         for (Enumeration e = features.getElements(); e.hasMoreElements(); ) {
             Feature curr_feat = (Feature) e.nextElement();
-            curr_feat.code(s);
+            curr_feat.code(s, curr_class, cgTable);
         }
     }
 
@@ -405,8 +412,9 @@ class method extends Feature {
 	expr.dump_with_types(out, n + 2);
     }
     
-    public void code(Printstream s) {
-        for (Enumeration e = 
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+            
+    }
 }
 
 
@@ -1247,6 +1255,7 @@ class eq extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s) {
+
     }
 
 
@@ -1499,6 +1508,7 @@ class new_ extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s) {
+        //do nothing?
     }
 
 
@@ -1540,6 +1550,7 @@ class isvoid extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s) {
+        //do nothing?
     }
 
 
@@ -1576,6 +1587,7 @@ class no_expr extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s) {
+        //do nothing?
     }
 
 
@@ -1617,6 +1629,11 @@ class object extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s) {
+        if (name != TreeConstants.self) {
+            String address = (String)
+        } else {
+            CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, s);
+        }
     }
 
 
