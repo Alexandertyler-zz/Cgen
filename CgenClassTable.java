@@ -40,7 +40,12 @@ class CgenClassTable extends SymbolTable {
     private int intclasstag;
     private int boolclasstag;
 
+    private labelNum = -1;
 
+    public void getLabelNum() {
+        labelNum++;
+        return labelNum;
+    }
     // The following methods emit code for constants and global
     // declarations.
 
