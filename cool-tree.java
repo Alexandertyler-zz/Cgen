@@ -1342,7 +1342,24 @@ class comp extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        int label = cgTable.getLabelNum()
+        e1.code(s, curr_class, cgTable, sTable);
+        
+        // lw $t1 12($a0)
+        CgenSupport.emitLoad(CgenSupport.T1, 3, CgenSupport.ACC, s);
+        
+        // la $a0 bool_const_true
+        CgenSupport.emitLoadBool(CgenSupport.ACC, BoolConst.truebool, s);
+
+        //compare 
+        CgenSupport.emitBeqz(CgenSupport.T1, label, s);
+        
+        // la $a0 bool_const_false
+        CgenSupport.emitLoadBool(CgenSupport.ACC, BoolConst.falsebool, s);
+        
+        // label def
+        CgenSupport.emitLabelDef(label, s);
     }
 
 
@@ -1382,7 +1399,8 @@ class int_const extends Expression {
       * to you as an example of code generation.
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+
 	CgenSupport.emitLoadInt(CgenSupport.ACC,
                                 (IntSymbol)AbstractTable.inttable.lookup(token.getString()), s);
     }
@@ -1423,7 +1441,8 @@ class bool_const extends Expression {
       * to you as an example of code generation.
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+   
 	CgenSupport.emitLoadBool(CgenSupport.ACC, new BoolConst(val), s);
     }
 
@@ -1465,7 +1484,8 @@ class string_const extends Expression {
       * to you as an example of code generation.
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+
 	CgenSupport.emitLoadString(CgenSupport.ACC,
                                    (StringSymbol)AbstractTable.stringtable.lookup(token.getString()), s);
     }
@@ -1549,11 +1569,26 @@ class isvoid extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
-        //do nothing?
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        int label = cgTable.getLabelNum();
+       
+        e1.code(s, curr_class, cgTable, sTable);
+        
+        //move $t1 $a0
+        CgenSupport.emitMove(CgenSupport.T1, CgenSupport.ACC, s);
+
+        //load true by default
+        CgenSupport.emitLoadBool(CgenSupport.ACC, BoolConst.truebool, s);
+
+        //beq $t1 0 end_label
+        CgenSupport.emitBeqz(CgenSupport.T1, label, s);
+        
+        // load false if reached
+        CgenSupport.emitLoadBool(CgenSupport.ACC, BoolConst.falsebool, s);
+        
+        // emit label to jump to if void 
+        CgenSupport.emitLabelDef(label, s);        
     }
-
-
 }
 
 
@@ -1586,8 +1621,8 @@ class no_expr extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
-        //do nothing?
+    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        CgenSupport.emitLoadImm(CgenSupport.ACC, 0, s);          
     }
 
 
