@@ -72,7 +72,8 @@ abstract class Feature extends TreeNode {
         super(lineNumber);
     }
     public abstract void dump_with_types(PrintStream out, int n);
-    
+
+    public abstract void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable);    
 }
 
 
@@ -155,7 +156,7 @@ abstract class Expression extends TreeNode {
         else
             { out.println(Utilities.pad(n) + ": _no_type"); }
     }
-    public abstract void code(PrintStream s);
+    public abstract void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable);
 
 }
 
@@ -293,8 +294,8 @@ class programc extends Program {
         SymbolTable sTable = new SymbolTable();
         cgTable.code();
         for (Enumeration e = classes.getElements(); e.hasMoreElements(); ) {
-            curr_class = (class_c) e.nextElement();
-            curr_class.code(s, curr_class, cgTable, sTable)
+            class_c curr_class = (class_c) e.nextElement();
+            curr_class.code(s, curr_class, cgTable, sTable);
         }
     }
 
@@ -354,13 +355,14 @@ class class_c extends Class_ {
     public AbstractSymbol getFilename() { return filename; }
     public Features getFeatures()       { return features; }
 
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         sTable.enterScope();
 
         for (Enumeration e = features.getElements(); e.hasMoreElements(); ) {
             Feature curr_feat = (Feature) e.nextElement();
-            curr_feat.code(s, curr_class, cgTable);
+            curr_feat.code(s, curr_class, cgTable, sTable );
         }
+	sTable.exitScope();
     }
 
 }
@@ -412,7 +414,7 @@ class method extends Feature {
 	expr.dump_with_types(out, n + 2);
     }
     
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
             
     }
 }
@@ -455,6 +457,9 @@ class attr extends Feature {
         dump_AbstractSymbol(out, n + 2, name);
         dump_AbstractSymbol(out, n + 2, type_decl);
 	init.dump_with_types(out, n + 2);
+    }
+
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 }
@@ -578,7 +583,7 @@ class assign extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -638,7 +643,7 @@ class static_dispatch extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -693,7 +698,7 @@ class dispatch extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -744,7 +749,7 @@ class cond extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -790,7 +795,7 @@ class loop extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -838,7 +843,7 @@ class typcase extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -881,7 +886,7 @@ class block extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -937,7 +942,7 @@ class let extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -983,7 +988,7 @@ class plus extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -1029,7 +1034,7 @@ class sub extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -1075,7 +1080,7 @@ class mul extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -1121,7 +1126,7 @@ class divide extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -1162,7 +1167,7 @@ class neg extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -1208,7 +1213,7 @@ class lt extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -1254,7 +1259,7 @@ class eq extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
 
     }
 
@@ -1301,7 +1306,7 @@ class leq extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     }
 
 
@@ -1342,8 +1347,8 @@ class comp extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        int label = cgTable.getLabelNum()
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        int label = cgTable.getLabelNum();
         e1.code(s, curr_class, cgTable, sTable);
         
         // lw $t1 12($a0)
@@ -1399,7 +1404,7 @@ class int_const extends Expression {
       * to you as an example of code generation.
       * @param s the output stream 
       * */
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
 
 	CgenSupport.emitLoadInt(CgenSupport.ACC,
                                 (IntSymbol)AbstractTable.inttable.lookup(token.getString()), s);
@@ -1441,7 +1446,7 @@ class bool_const extends Expression {
       * to you as an example of code generation.
       * @param s the output stream 
       * */
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
    
 	CgenSupport.emitLoadBool(CgenSupport.ACC, new BoolConst(val), s);
     }
@@ -1484,7 +1489,7 @@ class string_const extends Expression {
       * to you as an example of code generation.
       * @param s the output stream 
       * */
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
 
 	CgenSupport.emitLoadString(CgenSupport.ACC,
                                    (StringSymbol)AbstractTable.stringtable.lookup(token.getString()), s);
@@ -1527,7 +1532,7 @@ class new_ extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         //do nothing?
     }
 
@@ -1569,7 +1574,7 @@ class isvoid extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         int label = cgTable.getLabelNum();
        
         e1.code(s, curr_class, cgTable, sTable);
@@ -1621,7 +1626,7 @@ class no_expr extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(Printstream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         CgenSupport.emitLoadImm(CgenSupport.ACC, 0, s);          
     }
 
@@ -1663,12 +1668,12 @@ class object extends Expression {
       * you wish.)
       * @param s the output stream 
       * */
-    public void code(PrintStream s) {
-        if (name != TreeConstants.self) {
-            String address = (String)
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+       /* if (name != TreeConstants.self) {
+            String address = (String) 
         } else {
             CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, s);
-        }
+        }*/
     }
 
 

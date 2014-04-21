@@ -24,6 +24,10 @@ PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 import java.io.PrintStream;
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Stack;
+import java.util.Collections;
 
 /** This class is used for representing the inheritance tree during code
     generation. You will need to fill in some of its methods and
@@ -36,12 +40,12 @@ class CgenClassTable extends SymbolTable {
     /** This is the stream to which assembly instructions are output */
     private PrintStream str;
 
-    //private int stringclasstag;
-    //private int intclasstag;
-    //private int boolclasstag;
+    private int stringclasstag;
+    private int intclasstag;
+    private int boolclasstag;
 	
 	private int currClassTag = -1;
-	private void getNextClassTag() {
+	private int getNextClassTag() {
 		return currClassTag++;
 	}
 	
@@ -49,7 +53,7 @@ class CgenClassTable extends SymbolTable {
 		public int classTag;
 		public CgenNode node;
 		public ArrayList<attr> attributes;
-		public HashMap<method, AbstractSymbol> methods;
+		public HashMap<method, CgenNode> methods;
 		ClassInfo(CgenNode n) {
 			classTag = getNextClassTag();
 			node = n;
@@ -60,9 +64,9 @@ class CgenClassTable extends SymbolTable {
 		
 	private HashMap<AbstractSymbol, ClassInfo> class_ToClassInfo = new HashMap<AbstractSymbol, ClassInfo>();
 	
-    private labelNum = -1;
+    private int labelNum = -1;
 
-    public void getLabelNum() {
+    public int getLabelNum() {
         labelNum++;
         return labelNum;
     }
@@ -70,7 +74,7 @@ class CgenClassTable extends SymbolTable {
 	private void populateClass_ToClassInfo() {
 		for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
 			CgenNode n = (CgenNode) e.nextElement();
-			classToCgenNode.put(n.getName(), new ClassInfo(n));
+			class_ToClassInfo.put(n.getName(), new ClassInfo(n));
 		}
 	}
 	
@@ -81,16 +85,16 @@ class CgenClassTable extends SymbolTable {
 		while(!stack.isEmpty()) {
 			CgenNode currNode = (CgenNode) stack.pop();
 			CgenNode parent = currNode.getParentNd();
-			ClassInfo currNdInfo = classToCgenNode.get(currNode.getName());
+			ClassInfo currNdInfo = class_ToClassInfo.get(currNode.getName());
 			
 			//if not Object, add parent methods
 			if (parent.getName() != TreeConstants.No_class) {
-				ClassInfo parentInfo = classToCgenNode.get(parent.getName());
-				for (Enumeration e = parentInfo.attributes; e.hasMoreElements(); ) {
+				ClassInfo parentInfo = class_ToClassInfo.get(parent.getName());
+				for (Enumeration e = Collections.enumeration(parentInfo.attributes); e.hasMoreElements(); ) {
 					currNdInfo.attributes.add((attr) e);
 				}
-				for (Enumberation e = parentInfo.methods; e.hasMoreElements(); ) {
-					currNdInfo.methods.put(e.getKey(), e.getVal());
+            			for (method m : parentInfo.methods.keySet()) {
+					currNdInfo.methods.put(m, parentInfo.methods.get(m));
 				}
 			}
 			
@@ -98,18 +102,18 @@ class CgenClassTable extends SymbolTable {
 			for (Enumeration e = currNode.getFeatures().getElements(); e.hasMoreElements(); ) {
 				Object currFeat = e.nextElement();
 				if (currFeat instanceof attr) {
-					currNdInfo.attributes.add(currFeat);
+					currNdInfo.attributes.add((attr) currFeat);
 				}
 				if (currFeat instanceof method) {
-					currNdInfo.methods.put(method, currNode);
+					currNdInfo.methods.put((method) currFeat, currNode);
 				}
 			}
 
 			//add remaining children
 			for (Enumeration e = currNode.getChildren(); e.hasMoreElements(); ) {
-                CgenNode child = (CgenNode)e.nextElement();
-                stack.push(child);
-            }
+                		CgenNode child = (CgenNode)e.nextElement();
+                		stack.push(child);
+            		}
 		}
 	}
 
@@ -118,7 +122,7 @@ class CgenClassTable extends SymbolTable {
         //Code the Name Table
         str.print(CgenSupport.CLASSNAMETAB + "\n");
 
-        for (Enumeration e = nds.getElements(); e.hasMoreElements(); ) {
+        for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             StringSymbol name = (StringSymbol) AbstractTable.stringtable.lookup(curr_node.getName().getString());
             str.print(CgenSupport.WORD);
@@ -129,19 +133,19 @@ class CgenClassTable extends SymbolTable {
         //Code the Object Table
         str.print(CgenSupport.CLASSOBJTAB + "\n");
 
-        for (Enumeration e = nds.getElements(); e.hasMoreElements(); ) {
+        for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.print(CgenSupport.WORD + curr_node.getName() + CgenSupport.PROTOBJ_SUFFIX + "\n");
-            str.print(CgenSupport.Word + curr_node.getName() + CgenSupport.CLASSINIT_SUFFIX + "\n");
+            str.print(CgenSupport.WORD + curr_node.getName() + CgenSupport.CLASSINIT_SUFFIX + "\n");
         }
 
         //Code the Dispatch Table
-        for (Enumeration e = nds.getElements(); e.hasMoreElements(); ) {
+        for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.print(curr_node.getName() + CgenSupport.DISPTAB_SUFFIX + CgenSupport.LABEL);
-            ClassInfo curr_class = class_ToCLassInfo.get(curr_node.getName());
+            ClassInfo curr_class = class_ToClassInfo.get(curr_node.getName());
             for (method m : curr_class.methods.keySet()) {
-                str.print(CgenSupport.WORD + curr_class.methods.get(m).getString() + "." + m.getString() + "\n");
+                str.print(CgenSupport.WORD + curr_class.methods.get(m).toString() + "." + m.toString() + "\n");
             }
         }
 
@@ -484,11 +488,11 @@ class CgenClassTable extends SymbolTable {
 	nds = new Vector();
 
 	this.str = str;
-	/*
-	stringclasstag = 0 /* Change to your String class tag here ;
-	intclasstag =    0 /* Change to your Int class tag here ;
-	boolclasstag =   0 /* Change to your Bool class tag here ;
-	*/
+	
+	stringclasstag = 0 /* Change to your String class tag here*/ ;
+	intclasstag =    0 /* Change to your Int class tag here*/ ;
+	boolclasstag =   0 /* Change to your Bool class tag here*/ ;
+	
 	enterScope();
 	if (Flags.cgen_debug) System.out.println("Building CgenClassTable");
 	
