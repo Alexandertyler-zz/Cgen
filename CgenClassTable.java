@@ -112,7 +112,42 @@ class CgenClassTable extends SymbolTable {
             }
 		}
 	}
-		
+
+    private void codeClass_NameObjectDispatch_Tables() {
+        
+        //Code the Name Table
+        str.print(CgenSupport.CLASSNAMETAB + "\n");
+
+        for (Enumeration e = nds.getElements(); e.hasMoreElements(); ) {
+            CgenNode curr_node = (CgenNode) e.nextElement();
+            StringSymbol name = (StringSymbol) AbstractTable.stringtable.lookup(curr_node.getName().getString());
+            str.print(CgenSupport.WORD);
+            name.codeRef(str);
+            str.print("\n");
+        }
+
+        //Code the Object Table
+        str.print(CgenSupport.CLASSOBJTAB + "\n");
+
+        for (Enumeration e = nds.getElements(); e.hasMoreElements(); ) {
+            CgenNode curr_node = (CgenNode) e.nextElement();
+            str.print(CgenSupport.WORD + curr_node.getName() + CgenSupport.PROTOBJ_SUFFIX + "\n");
+            str.print(CgenSupport.Word + curr_node.getName() + CgenSupport.CLASSINIT_SUFFIX + "\n");
+        }
+
+        //Code the Dispatch Table
+        for (Enumeration e = nds.getElements(); e.hasMoreElements(); ) {
+            CgenNode curr_node = (CgenNode) e.nextElement();
+            str.print(curr_node.getName() + CgenSupport.DISPTAB_SUFFIX + CgenSupport.LABEL);
+            ClassInfo curr_class = class_ToCLassInfo.get(curr_node.getName());
+            for (method m : curr_class.methods.keySet()) {
+                str.print(CgenSupport.WORD + curr_class.methods.get(m).getString() + "." + m.getString() + "\n");
+            }
+        }
+
+    }
+
+    
     // The following methods emit code for constants and global
     // declarations.
 
@@ -483,7 +518,9 @@ class CgenClassTable extends SymbolTable {
 	if (Flags.cgen_debug) System.out.println("coding constants");
 	codeConstants();
 
-	//                 Add your code to emit
+	codeClass_NameObjectDispatch_Tables();
+    
+    //                 Add your code to emit
 	//                   - prototype objects
 	//                   - class_nameTab
 	//                   - dispatch tables
