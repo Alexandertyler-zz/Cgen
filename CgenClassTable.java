@@ -36,16 +36,83 @@ class CgenClassTable extends SymbolTable {
     /** This is the stream to which assembly instructions are output */
     private PrintStream str;
 
-    private int stringclasstag;
-    private int intclasstag;
-    private int boolclasstag;
-
+    //private int stringclasstag;
+    //private int intclasstag;
+    //private int boolclasstag;
+	
+	private int currClassTag = -1;
+	private void getNextClassTag() {
+		return currClassTag++;
+	}
+	
+	class ClassInfo {
+		public int classTag;
+		public CgenNode node;
+		public ArrayList<attr> attributes;
+		public HashMap<method, AbstractSymbol> methods;
+		ClassInfo(CgenNode n) {
+			classTag = getNextClassTag();
+			node = n;
+			attributes = new ArrayList<attr>();
+			methods = new HashMap<method, CgenNode>();
+		}
+	}
+		
+	private HashMap<AbstractSymbol, ClassInfo> class_ToClassInfo = new HashMap<AbstractSymbol, ClassInfo>();
+	
     private labelNum = -1;
 
     public void getLabelNum() {
         labelNum++;
         return labelNum;
     }
+	
+	private void populateClass_ToClassInfo() {
+		for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
+			CgenNode n = (CgenNode) e.nextElement();
+			classToCgenNode.put(n.getName(), new ClassInfo(n));
+		}
+	}
+	
+	private void populateFeatures() {
+		//step through all children using stack
+		Stack<CgenNode> stack = new Stack<CgenNode>();
+		stack.push(root());
+		while(!stack.isEmpty()) {
+			CgenNode currNode = (CgenNode) stack.pop();
+			CgenNode parent = currNode.getParentNd();
+			ClassInfo currNdInfo = classToCgenNode.get(currNode.getName());
+			
+			//if not Object, add parent methods
+			if (parent.getName() != TreeConstants.No_class) {
+				ClassInfo parentInfo = classToCgenNode.get(parent.getName());
+				for (Enumeration e = parentInfo.attributes; e.hasMoreElements(); ) {
+					currNdInfo.attributes.add((attr) e);
+				}
+				for (Enumberation e = parentInfo.methods; e.hasMoreElements(); ) {
+					currNdInfo.methods.put(e.getKey(), e.getVal());
+				}
+			}
+			
+			//add current features
+			for (Enumeration e = currNode.getFeatures().getElements(); e.hasMoreElements(); ) {
+				Object currFeat = e.nextElement();
+				if (currFeat instanceof attr) {
+					currNdInfo.attributes.add(currFeat);
+				}
+				if (currFeat instanceof method) {
+					currNdInfo.methods.put(method, currNode);
+				}
+			}
+
+			//add remaining children
+			for (Enumeration e = currNode.getChildren(); e.hasMoreElements(); ) {
+                CgenNode child = (CgenNode)e.nextElement();
+                stack.push(child);
+            }
+		}
+	}
+		
     // The following methods emit code for constants and global
     // declarations.
 
@@ -382,11 +449,11 @@ class CgenClassTable extends SymbolTable {
 	nds = new Vector();
 
 	this.str = str;
-
-	stringclasstag = 0 /* Change to your String class tag here */;
-	intclasstag =    0 /* Change to your Int class tag here */;
-	boolclasstag =   0 /* Change to your Bool class tag here */;
-
+	/*
+	stringclasstag = 0 /* Change to your String class tag here ;
+	intclasstag =    0 /* Change to your Int class tag here ;
+	boolclasstag =   0 /* Change to your Bool class tag here ;
+	*/
 	enterScope();
 	if (Flags.cgen_debug) System.out.println("Building CgenClassTable");
 	
@@ -394,8 +461,13 @@ class CgenClassTable extends SymbolTable {
 	installClasses(cls);
 	buildInheritanceTree();
 
-	code();
-
+	//creates HashMap of AbstractSymbols to CgenNodes
+	populateClass_ToClassInfo(); 
+	
+	//set labels -- already done when we make the hashmap
+	//set features
+	populateFeatures();
+	
 	exitScope();
     }
 

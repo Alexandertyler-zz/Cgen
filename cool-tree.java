@@ -289,9 +289,9 @@ class programc extends Program {
 
     // if you want to print out comments use #
 
-	   CgenClassTable cgTable = new CgenClassTable(classes, s);
-       SymbolTable sTable = new SymbolTable();
-        cgTable.code(s);
+	    CgenClassTable cgTable = new CgenClassTable(classes, s);
+        SymbolTable sTable = new SymbolTable();
+        cgTable.code();
         for (Enumeration e = classes.getElements(); e.hasMoreElements(); ) {
             curr_class = (class_c) e.nextElement();
             curr_class.code(s, curr_class, cgTable, sTable)
