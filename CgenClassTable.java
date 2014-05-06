@@ -43,7 +43,7 @@ class CgenClassTable extends SymbolTable {
     private int intclasstag;
     private int boolclasstag;
 	
-	private int currClassTag = 4;
+	private int currClassTag = 0;
 	private int getNextClassTag() {
 		return currClassTag++;
 	}
@@ -257,6 +257,7 @@ class CgenClassTable extends SymbolTable {
 	AbstractTable.stringtable.addString("");
 	AbstractTable.inttable.addString("0");
 
+        
 	AbstractTable.stringtable.codeStringTable(stringclasstag, str);
 	AbstractTable.inttable.codeStringTable(intclasstag, str);
 	codeBools(boolclasstag);
@@ -491,9 +492,10 @@ class CgenClassTable extends SymbolTable {
 
 	this.str = str;
 	
-	stringclasstag = 2 /* Change to your String class tag here*/ ;
-	intclasstag =    3 /* Change to your Int class tag here*/ ;
-	boolclasstag =   4 /* Change to your Bool class tag here*/ ;
+        
+	//stringclasstag = 2 /* Change to your String class tag here*/ ;
+	//intclasstag =    3 /* Change to your Int class tag here*/ ;
+	//boolclasstag =   4 /* Change to your Bool class tag here*/ ;
 	
 	enterScope();
 	if (Flags.cgen_debug) System.out.println("Building CgenClassTable");
@@ -505,8 +507,12 @@ class CgenClassTable extends SymbolTable {
 	//creates HashMap of AbstractSymbols to CgenNodes
 	populateClass_ToClassInfo(); 
 	
-	//set labels -- already done when we make the hashmap
-	//set features
+        stringclasstag = class_ToClassInfo.get(TreeConstants.Str).classTag;
+        intclasstag = class_ToClassInfo.get(TreeConstants.Int).classTag;
+        boolclasstag = class_ToClassInfo.get(TreeConstants.Bool).classTag;
+        
+     	//set tags -- already done when we make the hashmap
+	//set features - attr and methods
 	populateFeatures();
 	
 	exitScope();
@@ -543,11 +549,14 @@ class CgenClassTable extends SymbolTable {
     }
 
     public void codePrototypeObjects() {
+        
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.println(CgenSupport.WORD + "-1");
 
             ClassInfo curr_class = class_ToClassInfo.get(curr_node.getName());
+            str.print(curr_node.getName());
+            str.print(CgenSupport.PROTOBJ_SUFFIX + CgenSupport.LABEL);
             str.println(CgenSupport.WORD + curr_class.classTag);
 
             str.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + curr_class.attributes.size()));
@@ -573,8 +582,7 @@ class CgenClassTable extends SymbolTable {
                 else {
                     str.print("0");
                 }
-                str.print("/n");
-                //DO WE NEED TO PRINT NAME?
+                str.print("\n");
             }
         }
     }
