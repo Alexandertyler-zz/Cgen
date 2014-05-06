@@ -39,12 +39,11 @@ class CgenClassTable extends SymbolTable {
 
     /** This is the stream to which assembly instructions are output */
     private PrintStream str;
-
     private int stringclasstag;
     private int intclasstag;
     private int boolclasstag;
 	
-	private int currClassTag = -1;
+	private int currClassTag = 4;
 	private int getNextClassTag() {
 		return currClassTag++;
 	}
@@ -121,7 +120,7 @@ class CgenClassTable extends SymbolTable {
         
         //Code the Name Table
         str.print(CgenSupport.CLASSNAMETAB + "\n");
-
+        str.print("#CLASS NAME TABLE:\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             StringSymbol name = (StringSymbol) AbstractTable.stringtable.lookup(curr_node.getName().getString());
@@ -132,7 +131,7 @@ class CgenClassTable extends SymbolTable {
 
         //Code the Object Table
         str.print(CgenSupport.CLASSOBJTAB + "\n");
-
+        str.print("#CLASS OBJECT TABLE\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.print(CgenSupport.WORD + curr_node.getName() + CgenSupport.PROTOBJ_SUFFIX + "\n");
@@ -140,12 +139,13 @@ class CgenClassTable extends SymbolTable {
         }
 
         //Code the Dispatch Table
+        str.print("#DISPATCH TABLE\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.print(curr_node.getName() + CgenSupport.DISPTAB_SUFFIX + CgenSupport.LABEL);
             ClassInfo curr_class = class_ToClassInfo.get(curr_node.getName());
             for (method m : curr_class.methods.keySet()) {
-                str.print(CgenSupport.WORD + curr_class.methods.get(m).toString() + "." + m.toString() + "\n");
+                str.print(CgenSupport.WORD + curr_class.methods.get(m).getName() + "." + m.name.getString() + "\n");
             }
         }
 
@@ -181,6 +181,8 @@ class CgenClassTable extends SymbolTable {
 	str.println(CgenSupport.GLOBAL + CgenSupport.INTTAG);
 	str.println(CgenSupport.GLOBAL + CgenSupport.BOOLTAG);
 	str.println(CgenSupport.GLOBAL + CgenSupport.STRINGTAG);
+
+        // Add globals for prototype objects
 
 	// We also need to know the tag of the Int, String, and Bool classes
 	// during code generation.
@@ -489,9 +491,9 @@ class CgenClassTable extends SymbolTable {
 
 	this.str = str;
 	
-	stringclasstag = 0 /* Change to your String class tag here*/ ;
-	intclasstag =    0 /* Change to your Int class tag here*/ ;
-	boolclasstag =   0 /* Change to your Bool class tag here*/ ;
+	stringclasstag = 2 /* Change to your String class tag here*/ ;
+	intclasstag =    3 /* Change to your Int class tag here*/ ;
+	boolclasstag =   4 /* Change to your Bool class tag here*/ ;
 	
 	enterScope();
 	if (Flags.cgen_debug) System.out.println("Building CgenClassTable");
@@ -529,6 +531,8 @@ class CgenClassTable extends SymbolTable {
 	//                   - class_nameTab
 	//                   - dispatch tables
 
+        codePrototypeObjects();
+
 	if (Flags.cgen_debug) System.out.println("coding global text");
 	codeGlobalText();
 
@@ -537,6 +541,44 @@ class CgenClassTable extends SymbolTable {
 	//                   - the class methods
 	//                   - etc...
     }
+
+    public void codePrototypeObjects() {
+        for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
+            CgenNode curr_node = (CgenNode) e.nextElement();
+            str.println(CgenSupport.WORD + "-1");
+
+            ClassInfo curr_class = class_ToClassInfo.get(curr_node.getName());
+            str.println(CgenSupport.WORD + curr_class.classTag);
+
+            str.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + curr_class.attributes.size()));
+
+            str.println(CgenSupport.WORD + curr_node.getName() + CgenSupport.DISPTAB_SUFFIX);
+
+            for (Enumeration e_att = Collections.enumeration(curr_class.attributes); e_att.hasMoreElements(); ) {
+                attr curr_attr = (attr) e_att.nextElement();
+                AbstractSymbol curr_type = curr_attr.type_decl;
+                str.print(CgenSupport.WORD);
+                if (curr_type == TreeConstants.Bool) {
+                    BoolConst b = new BoolConst(false);
+                    b.codeRef(str);
+                }
+                else if (curr_type == TreeConstants.Str) {
+                    StringSymbol s = (StringSymbol) (AbstractTable.stringtable.lookup(""));
+                    s.codeRef(str);
+                }
+                else if (curr_type == TreeConstants.Int) {
+                    IntSymbol i = (IntSymbol) (AbstractTable.inttable.addInt(0));
+                    i.codeRef(str);
+                }
+                else {
+                    str.print("0");
+                }
+                str.print("/n");
+                //DO WE NEED TO PRINT NAME?
+            }
+        }
+    }
+            
 
     /** Gets the root of the inheritance tree */
     public CgenNode root() {
