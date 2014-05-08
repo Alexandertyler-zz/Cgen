@@ -445,10 +445,11 @@ class method extends Feature {
 
         CgenSupport.emitMethodRef(curr_class.getName(), name, s);
         s.print(CgenSupport.LABEL);
-        CgenSupport.emitPush(CgenSupport.FP, s);
-        CgenSupport.emitPush(CgenSupport.SELF, s);
-        CgenSupport.emitPush(CgenSupport.RA, s);
-        CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 4, s);
+        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -12, s);
+	CgenSupport.emitStore(CgenSupport.FP, 3, CgenSupport.SP, s);
+	CgenSupport.emitStore(CgenSupport.SELF, 2, CgenSupport.SP, s);
+	CgenSupport.emitStore(CgenSupport.RA, 1, CgenSupport.SP, s);
+	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 16, s);
         CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
         
         for (int iter = 0; iter < formals.getLength(); iter++) {
@@ -1732,7 +1733,6 @@ class object extends Expression {
 	    	CgenSupport.emitLoad(CgenSupport.ACC, sTable.lookup(name), s);
 	    } else {
 		s.println("___");
-		
         } else {
             CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, s);
         }
