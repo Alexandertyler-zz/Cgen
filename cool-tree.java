@@ -11,6 +11,8 @@
 import java.util.Enumeration;
 import java.io.PrintStream;
 import java.util.Vector;
+import java.util.Collections;
+
 
 
 /** Defines simple phylum Program */
@@ -290,11 +292,17 @@ class programc extends Program {
 
     // if you want to print out comments use #
 
+        //this initializes the Code Gen table and does some generation of its own
 	    CgenClassTable cgTable = new CgenClassTable(classes, s);
         SymbolTable sTable = new SymbolTable();
+
+        //this is the initial call that makes all the setup for running a program
         cgTable.code();
+
+        //once that is done we need to walk through all of our classes and call cgen for them.
         for (Enumeration e = classes.getElements(); e.hasMoreElements(); ) {
             class_c curr_class = (class_c) e.nextElement();
+            //for each call we need to pass in the cgentable, symboltable, 
             curr_class.code(s, curr_class, cgTable, sTable);
         }
     }
@@ -356,10 +364,25 @@ class class_c extends Class_ {
     public Features getFeatures()       { return features; }
 
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+
+        s.println("#Entering Class");
+        //our first step into code generation. This splits into features for each class
         sTable.enterScope();
+
+        //populate the symbol table
+        ClassInfo curr_classInfo = cgTable.class_ToClassInfo.get(curr_class);
+        ArrayList<attr> attributes = curr_classInfo.attributes;
+        int count = 0;
+        for (Enumeration e_attr = Collections.enumeration(attributes); e_attr.hasMoreElements(); ) {
+            attr curr_attr = (attr) e_attr.nextElement();
+            //Count ++ might need to start at -1
+            int attr_offset = (4 * count++) + 12;
+            sTable.addId(curr_attr.name, "" + attr_offset + "($s0)");
+        }
 
         for (Enumeration e = features.getElements(); e.hasMoreElements(); ) {
             Feature curr_feat = (Feature) e.nextElement();
+            //assuming it should be a method. if its an attr i have it blank out.
             curr_feat.code(s, curr_class, cgTable, sTable );
         }
 	sTable.exitScope();
@@ -415,7 +438,7 @@ class method extends Feature {
     }
     
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-            
+        s.println("#Entering Method");
     }
 }
 
