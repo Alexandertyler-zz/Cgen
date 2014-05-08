@@ -460,7 +460,7 @@ class method extends Feature {
         CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.FP, 3, CgenSupport.SP, s);
-        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()+12), s);
+        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()-12), s);
         CgenSupport.emitReturn(s);
 
         sTable.exitScope();
@@ -1727,11 +1727,15 @@ class object extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-       /* if (name != TreeConstants.self) {
-            String address = (String) 
+        if (name != TreeConstants.self) {
+            if (sTable.lookup(name) != null) {
+	    	CgenSupport.emitLoad(CgenSupport.ACC, sTable.lookup(name), s);
+	    } else {
+		s.println("___");
+		
         } else {
             CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, s);
-        }*/
+        }
     }
 
 
