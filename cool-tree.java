@@ -440,6 +440,30 @@ class method extends Feature {
     
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         s.println("#Entering Method");
+
+        sTable.enterScope();
+
+        CgenSupport.emitMethodRef(curr_class.getName(), name, s);
+        s.print(CgenSupport.LABEL);
+        CgenSupport.emitPush(CgenSupport.FP, s);
+        CgenSupport.emitPush(CgenSupport.SELF, s);
+        CgenSupport.emitPush(CgenSupport.RA, s);
+        CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 4, s);
+        CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
+        
+        for (int iter = 0; iter < formals.getLength(); iter++) {
+                    formal curr_formal = (formal) formals.getNth(iter);
+                    sTable.addID(curr_formal.name, "" + (4*(formals.getLength() - iter) + 8) + "($fp)");
+                }
+        expr.code();
+
+        CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
+        CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
+        CgenSupport.emitLoad(CgenSupport.FP, 3, CgenSupport.SP, s);
+        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()+12), s);
+        CgenSupport.emitReturn(s);
+
+        sTable.exitScope();
     }
 }
 
