@@ -445,10 +445,11 @@ class method extends Feature {
 
         CgenSupport.emitMethodRef(curr_class.getName(), name, s);
         s.print(CgenSupport.LABEL);
-        CgenSupport.emitPush(CgenSupport.FP, s);
-        CgenSupport.emitPush(CgenSupport.SELF, s);
-        CgenSupport.emitPush(CgenSupport.RA, s);
-        CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 4, s);
+        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -12, s);
+	CgenSupport.emitStore(CgenSupport.FP, 3, CgenSupport.SP, s);
+	CgenSupport.emitStore(CgenSupport.SELF, 2, CgenSupport.SP, s);
+	CgenSupport.emitStore(CgenSupport.RA, 1, CgenSupport.SP, s);
+	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 16, s);
         CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
         
         for (int iter = 0; iter < formals.getLength(); iter++) {
@@ -460,7 +461,7 @@ class method extends Feature {
         CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.FP, 3, CgenSupport.SP, s);
-        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()+12), s);
+        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()-12), s);
         CgenSupport.emitReturn(s);
 
         sTable.exitScope();
@@ -1727,11 +1728,15 @@ class object extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-       /* if (name != TreeConstants.self) {
-            String address = (String) 
+        if (name != TreeConstants.self) {
+            if (sTable.lookup(name) != null) {
+	    	CgenSupport.emitLoadAddress(CgenSupport.ACC, (String) sTable.lookup(name), s);
+	    } else {
+		s.println("___");
+            }
         } else {
             CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, s);
-        }*/
+        }
     }
 
 
