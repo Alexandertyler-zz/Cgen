@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import java.io.PrintStream;
 import java.util.Vector;
 import java.util.Collections;
-
+import java.util.ArrayList;
 
 
 /** Defines simple phylum Program */
@@ -370,8 +370,7 @@ class class_c extends Class_ {
         sTable.enterScope();
 
         //populate the symbol table
-        ClassInfo curr_classInfo = cgTable.class_ToClassInfo.get(curr_class);
-        ArrayList<attr> attributes = curr_classInfo.attributes;
+        ArrayList<attr> attributes = cgTable.getClassInfoAttr(curr_class);
         int count = 0;
         for (Enumeration e_attr = Collections.enumeration(attributes); e_attr.hasMoreElements(); ) {
             attr curr_attr = (attr) e_attr.nextElement();
