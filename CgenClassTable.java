@@ -120,7 +120,7 @@ class CgenClassTable extends SymbolTable {
         
         //Code the Name Table
         str.print(CgenSupport.CLASSNAMETAB + "\n");
-        str.print("#CLASS NAME TABLE:\n");
+        //str.print("#CLASS NAME TABLE:\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             StringSymbol name = (StringSymbol) AbstractTable.stringtable.lookup(curr_node.getName().getString());
@@ -131,7 +131,7 @@ class CgenClassTable extends SymbolTable {
 
         //Code the Object Table
         str.print(CgenSupport.CLASSOBJTAB + "\n");
-        str.print("#CLASS OBJECT TABLE\n");
+        //str.print("#CLASS OBJECT TABLE\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.print(CgenSupport.WORD + curr_node.getName() + CgenSupport.PROTOBJ_SUFFIX + "\n");
@@ -139,7 +139,7 @@ class CgenClassTable extends SymbolTable {
         }
 
         //Code the Dispatch Table
-        str.print("#DISPATCH TABLE\n");
+        //str.print("#DISPATCH TABLE\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.print(curr_node.getName() + CgenSupport.DISPTAB_SUFFIX + CgenSupport.LABEL);
@@ -546,6 +546,7 @@ class CgenClassTable extends SymbolTable {
 	//                   - object initializer
 	//                   - the class methods
 	//                   - etc...
+        Initialize();
     }
 
     public void codePrototypeObjects() {
@@ -586,8 +587,77 @@ class CgenClassTable extends SymbolTable {
             }
         }
     }
+    public void Initialize() {
+        for (Enumeration e = nds.elements(); e.hasMoreElements();) {
+            CgenNode curr_node = (CgenNode) e.nextElement();
+            ClassInfo curr_nodeCI = class_ToClassInfo.get(curr_node);
+            //Update symbol table somehow?
+            //Since cgenclass table extends symtable ill just use symtables methods and hope our current cgentable keeps track of it appropriately
+            enterScope();
+            int count = 0;
+            for (Enumeration e_attr = Collections.enumeration(curr_nodeCI.attributes); e_attr.hasMoreElements();) {
+                    attr curr_attr = (attr) e_attr.nextElement();
+                    int attr_offset = (4 * count++) + 12;
+                    addId(curr_attr.name, "" + attr_offset + "($s0)");
+            }
             
+            str.print(curr_node.getName() + CgenSupport.CLASSINIT_SUFFIX + CgenSupport.LABEL);
 
+            //emit initial code
+            CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -12, str);
+            CgenSupport.emitStore(CgenSupport.FP, 3, CgenSupport.SP, str);
+            CgenSupport.emitStore(CgenSupport.SELF, 2, CgenSupport.SP, str);
+            CgenSupport.emitStore(CgenSupport.RA, 1, CgenSupport.SP, str);
+            CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 4, str);
+            CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, str);
+            
+            //get parent node
+            CgenNode curr_nodeParent = curr_node.getParentNd();
+            ClassInfo curr_nodeParentCI = class_ToClassInfo.get(curr_nodeParent);
+            //if not no class, then jal to parents attributes
+            if (curr_nodeParent.getName() != TreeConstants.No_class) {
+                CgenSupport.emitJal(curr_nodeParent.getName() + CgenSupport.CLASSINIT_SUFFIX, str);
+            }
+
+            int currAttrs = curr_nodeCI.attributes.size();
+            int parentAttrs = 0;
+            if (curr_nodeParentCI.attributes != null) {
+                parentAttrs = curr_nodeParentCI.attributes.size();
+            }
+
+            for (int i = parentAttrs; i < currAttrs; i++) {
+                attr curr_attr = curr_nodeCI.attributes.get(i);
+                
+                //code expression curr_attr.init.code(all the shit)
+                //needs to be completed in cooltree
+                if (!(curr_attr.init instanceof no_expr)) {
+                    
+                    int offset = 3 + i;
+                    CgenSupport.emitStore(CgenSupport.ACC, offset,
+                                          CgenSupport.SELF, str);
+                    
+                    if (Flags.cgen_Memmgr == Flags.GC_GENGC) {
+                        String loc = "" + offset*4 + "($s0)";
+                        CgenSupport.emitLoadAddress(CgenSupport.A1, loc, str);
+                        CgenSupport.emitJal("_GenGC_Assign", str);
+                    }
+                }
+            }
+
+            CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, str);
+            CgenSupport.emitLoad(CgenSupport.FP, 3, CgenSupport.SP, str);
+            CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, str);
+            CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, str);
+            CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 12, str);
+            CgenSupport.emitReturn(str);
+
+            
+            exitScope();
+    }
+}
+                            
+            
+            
     /** Gets the root of the inheritance tree */
     public CgenNode root() {
 	return (CgenNode)probe(TreeConstants.Object_);
