@@ -293,7 +293,7 @@ class programc extends Program {
     // if you want to print out comments use #
 
         //this initializes the Code Gen table and does some generation of its own
-	    CgenClassTable cgTable = new CgenClassTable(classes, s);
+	CgenClassTable cgTable = new CgenClassTable(classes, s);
         SymbolTable sTable = new SymbolTable();
 
         //this is the initial call that makes all the setup for running a program
@@ -456,12 +456,15 @@ class method extends Feature {
                     formalc curr_formal = (formalc) formals.getNth(iter);
                     sTable.addId(curr_formal.name, ("" + (4*(formals.getLength() - iter) + 8) + "($fp)"));
         }
+
+	s.println("#Before expr.code");
         expr.code(s, curr_class, cgTable, sTable);
+	s.println("#After expr.code");
 
         CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.FP, 3, CgenSupport.SP, s);
-        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()-12), s);
+        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()+12), s);
         CgenSupport.emitReturn(s);
 
         sTable.exitScope();
@@ -1366,6 +1369,8 @@ class leq extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        //CgenSupport
+
     }
 
 
@@ -1549,7 +1554,6 @@ class string_const extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-
 	CgenSupport.emitLoadString(CgenSupport.ACC,
                                    (StringSymbol)AbstractTable.stringtable.lookup(token.getString()), s);
     }
@@ -1592,7 +1596,25 @@ class new_ extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        //do nothing?
+        if (type_name != TreeConstants.SELF_TYPE) {
+	    CgenSupport.emitLoadAddress(CgenSupport.ACC, type_name.getString() + CgenSupport.PROTOBJ_SUFFIX, s);
+	    CgenSupport.emitJal("Object.copy", s);
+	    CgenSupport.emitJal(type_name.getString() + CgenSupport.CLASSINIT_SUFFIX, s);
+	} else {
+	    CgenSupport.emitLoadAddress(CgenSupport.T1, "class_objTab", s);
+	    CgenSupport.emitLoad(CgenSupport.T2, 0, CgenSupport.SELF, s);
+	    CgenSupport.emitSll(CgenSupport.T2, CgenSupport.T2, 3, s);
+	    CgenSupport.emitAddu(CgenSupport.T1, CgenSupport.T1, CgenSupport.T2, s);
+	    
+	    CgenSupport.emitStore(CgenSupport.T1, 0, CgenSupport.T1, s);
+	    CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -4, s);
+	    CgenSupport.emitLoad(CgenSupport.ACC, 0, CgenSupport.T1, s);
+	    CgenSupport.emitJal("Object.copy", s);
+	    CgenSupport.emitLoad(CgenSupport.T2, 1, CgenSupport.SP, s);
+	    CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
+	    CgenSupport.emitLoad(CgenSupport.T1, 1, CgenSupport.T2, s);
+	    CgenSupport.emitJalr(CgenSupport.T1, s);
+	}
     }
 
 
@@ -1732,7 +1754,7 @@ class object extends Expression {
             if (sTable.lookup(name) != null) {
 	    	CgenSupport.emitLoadAddress(CgenSupport.ACC, (String) sTable.lookup(name), s);
 	    } else {
-		s.println("___");
+		//error?
             }
         } else {
             CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, s);
