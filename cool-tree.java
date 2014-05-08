@@ -371,12 +371,14 @@ class class_c extends Class_ {
 
         //populate the symbol table
         ArrayList<attr> attributes = cgTable.getClassInfoAttr(curr_class);
-        int count = 0;
-        for (Enumeration e_attr = Collections.enumeration(attributes); e_attr.hasMoreElements(); ) {
-            attr curr_attr = (attr) e_attr.nextElement();
-            //Count ++ might need to start at -1
-            int attr_offset = (4 * count++) + 12;
-            sTable.addId(curr_attr.name, "" + attr_offset + "($s0)");
+         if (attributes) {
+           int count = 0;
+            for (Enumeration e_attr = Collections.enumeration(attributes); e_attr.hasMoreElements(); ) {
+                attr curr_attr = (attr) e_attr.nextElement();
+                //Count ++ might need to start at -1
+                int attr_offset = (4 * count++) + 12;
+                sTable.addId(curr_attr.name, "" + attr_offset + "($s0)");
+            }
         }
 
         for (Enumeration e = features.getElements(); e.hasMoreElements(); ) {

@@ -64,8 +64,10 @@ class CgenClassTable extends SymbolTable {
     private HashMap<AbstractSymbol, ClassInfo> class_ToClassInfo = new HashMap<AbstractSymbol, ClassInfo>();
 
     public ArrayList<attr> getClassInfoAttr(class_c curr_class) {
-	ClassInfo curr_class_info = class_ToClassInfo.get(curr_class);
-	return curr_class_info.attributes;
+		ClassInfo curr_class_info = class_ToClassInfo.get(curr_class);
+		if (curr_class_info) {
+			return curr_class_info.attributes;
+		}
     }
 	
     private int labelNum = -1;
