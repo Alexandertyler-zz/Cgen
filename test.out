@@ -192,7 +192,6 @@ bool_const1:
 	.word	Bool_dispTab
 	.word	1
 class_nameTab
-#CLASS NAME TABLE:
 	.word	str_const5
 	.word	str_const6
 	.word	str_const7
@@ -200,7 +199,6 @@ class_nameTab
 	.word	str_const9
 	.word	str_const10
 class_objTab
-#CLASS OBJECT TABLE
 	.word	Object_protObj
 	.word	Object_init
 	.word	IO_protObj
@@ -213,39 +211,38 @@ class_objTab
 	.word	String_init
 	.word	Main_protObj
 	.word	Main_init
-#DISPATCH TABLE
 Object_dispTab:
-	.word	Object.abort
-	.word	Object.copy
 	.word	Object.type_name
+	.word	Object.copy
+	.word	Object.abort
 IO_dispTab:
 	.word	IO.in_int
-	.word	IO.out_string
-	.word	Object.abort
-	.word	Object.copy
 	.word	Object.type_name
-	.word	IO.out_int
+	.word	Object.copy
+	.word	Object.abort
 	.word	IO.in_string
+	.word	IO.out_int
+	.word	IO.out_string
 Int_dispTab:
-	.word	Object.abort
-	.word	Object.copy
 	.word	Object.type_name
+	.word	Object.copy
+	.word	Object.abort
 Bool_dispTab:
-	.word	Object.abort
-	.word	Object.copy
 	.word	Object.type_name
+	.word	Object.copy
+	.word	Object.abort
 String_dispTab:
-	.word	Object.abort
-	.word	Object.copy
 	.word	Object.type_name
-	.word	String.substr
 	.word	String.concat
+	.word	Object.copy
+	.word	Object.abort
+	.word	String.substr
 	.word	String.length
 Main_dispTab:
-	.word	Main.main
-	.word	Object.abort
-	.word	Object.copy
 	.word	Object.type_name
+	.word	Object.copy
+	.word	Object.abort
+	.word	Main.main
 	.word	-1
 Object_protObj:
 	.word	0
@@ -289,6 +286,89 @@ heap_start:
 	.globl	String_init
 	.globl	Bool_init
 	.globl	Main.main
+Object_init:
+	addiu	$sp $sp -12
+	sw	$fp 12($sp)
+	sw	$s0 8($sp)
+	sw	$ra 4($sp)
+	addiu	$fp $sp 4
+	move	$s0 $a0
+	move	$a0 $s0
+	lw	$fp 12($sp)
+	lw	$s0 8($sp)
+	lw	$ra 4($sp)
+	addiu	$sp $sp 12
+	jr	$ra	
+IO_init:
+	addiu	$sp $sp -12
+	sw	$fp 12($sp)
+	sw	$s0 8($sp)
+	sw	$ra 4($sp)
+	addiu	$fp $sp 4
+	move	$s0 $a0
+	jal	Object_init
+	move	$a0 $s0
+	lw	$fp 12($sp)
+	lw	$s0 8($sp)
+	lw	$ra 4($sp)
+	addiu	$sp $sp 12
+	jr	$ra	
+Int_init:
+	addiu	$sp $sp -12
+	sw	$fp 12($sp)
+	sw	$s0 8($sp)
+	sw	$ra 4($sp)
+	addiu	$fp $sp 4
+	move	$s0 $a0
+	jal	Object_init
+	move	$a0 $s0
+	lw	$fp 12($sp)
+	lw	$s0 8($sp)
+	lw	$ra 4($sp)
+	addiu	$sp $sp 12
+	jr	$ra	
+Bool_init:
+	addiu	$sp $sp -12
+	sw	$fp 12($sp)
+	sw	$s0 8($sp)
+	sw	$ra 4($sp)
+	addiu	$fp $sp 4
+	move	$s0 $a0
+	jal	Object_init
+	move	$a0 $s0
+	lw	$fp 12($sp)
+	lw	$s0 8($sp)
+	lw	$ra 4($sp)
+	addiu	$sp $sp 12
+	jr	$ra	
+String_init:
+	addiu	$sp $sp -12
+	sw	$fp 12($sp)
+	sw	$s0 8($sp)
+	sw	$ra 4($sp)
+	addiu	$fp $sp 4
+	move	$s0 $a0
+	jal	Object_init
+	move	$a0 $s0
+	lw	$fp 12($sp)
+	lw	$s0 8($sp)
+	lw	$ra 4($sp)
+	addiu	$sp $sp 12
+	jr	$ra	
+Main_init:
+	addiu	$sp $sp -12
+	sw	$fp 12($sp)
+	sw	$s0 8($sp)
+	sw	$ra 4($sp)
+	addiu	$fp $sp 4
+	move	$s0 $a0
+	jal	Object_init
+	move	$a0 $s0
+	lw	$fp 12($sp)
+	lw	$s0 8($sp)
+	lw	$ra 4($sp)
+	addiu	$sp $sp 12
+	jr	$ra	
 #ANN(COOLCLASS, "Object", "_no_class")
 #ANN(COOLMETHOD, "Object", "abort", "Object")
 #ANN(COOLMETHOD, "Object", "type_name", "String")

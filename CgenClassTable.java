@@ -590,7 +590,7 @@ class CgenClassTable extends SymbolTable {
     public void Initialize() {
         for (Enumeration e = nds.elements(); e.hasMoreElements();) {
             CgenNode curr_node = (CgenNode) e.nextElement();
-            ClassInfo curr_nodeCI = class_ToClassInfo.get(curr_node);
+            ClassInfo curr_nodeCI = class_ToClassInfo.get(curr_node.getName());
             //Update symbol table somehow?
             //Since cgenclass table extends symtable ill just use symtables methods and hope our current cgentable keeps track of it appropriately
             enterScope();
@@ -613,15 +613,13 @@ class CgenClassTable extends SymbolTable {
             
             //get parent node
             CgenNode curr_nodeParent = curr_node.getParentNd();
-            ClassInfo curr_nodeParentCI = class_ToClassInfo.get(curr_nodeParent);
-            //if not no class, then jal to parents attributes
-            if (curr_nodeParent.getName() != TreeConstants.No_class) {
-                CgenSupport.emitJal(curr_nodeParent.getName() + CgenSupport.CLASSINIT_SUFFIX, str);
-            }
+            ClassInfo curr_nodeParentCI = class_ToClassInfo.get(curr_nodeParent.getName());
 
             int currAttrs = curr_nodeCI.attributes.size();
             int parentAttrs = 0;
-            if (curr_nodeParentCI.attributes != null) {
+            //if not no class, then jal to parents attributes
+            if (curr_nodeParent.getName() != TreeConstants.No_class) {
+                CgenSupport.emitJal(curr_nodeParent.getName() + CgenSupport.CLASSINIT_SUFFIX, str);
                 parentAttrs = curr_nodeParentCI.attributes.size();
             }
 
