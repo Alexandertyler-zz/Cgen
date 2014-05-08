@@ -370,8 +370,8 @@ class class_c extends Class_ {
         sTable.enterScope();
 
         //populate the symbol table
-        ArrayList<attr> attributes = cgTable.getClassInfoAttr(curr_class);
-         if (attributes) {
+        ArrayList<attr> attributes = cgTable.getClassInfoAttr(curr_class.getName());
+         if (attributes != null) {
            int count = 0;
             for (Enumeration e_attr = Collections.enumeration(attributes); e_attr.hasMoreElements(); ) {
                 attr curr_attr = (attr) e_attr.nextElement();
