@@ -452,10 +452,10 @@ class method extends Feature {
         CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
         
         for (int iter = 0; iter < formals.getLength(); iter++) {
-                    formal curr_formal = (formal) formals.getNth(iter);
-                    sTable.addID(curr_formal.name, "" + (4*(formals.getLength() - iter) + 8) + "($fp)");
+                    formalc curr_formal = (formalc) formals.getNth(iter);
+                    sTable.addId(curr_formal.name, ("" + (4*(formals.getLength() - iter) + 8) + "($fp)"));
         }
-        expr.code();
+        expr.code(s, curr_class, cgTable, sTable);
 
         CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
@@ -508,6 +508,7 @@ class attr extends Feature {
     }
 
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    
     }
 
 }
@@ -637,7 +638,9 @@ class assign extends Expression {
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         expr.code(s, curr_class, cgTable, sTable);
-
+	
+	s.println(CgenSupport.SW + CgenSupport.ACC + "\t" + sTable.lookup(name));
+		
     }
 
 
@@ -698,6 +701,7 @@ class static_dispatch extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    	
     }
 
 

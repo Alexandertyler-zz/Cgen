@@ -212,36 +212,36 @@ class_objTab
 	.word	Main_protObj
 	.word	Main_init
 Object_dispTab:
-	.word	Object.type_name
 	.word	Object.abort
+	.word	Object.type_name
 	.word	Object.copy
 IO_dispTab:
-	.word	IO.in_string
-	.word	Object.type_name
-	.word	IO.out_string
-	.word	IO.in_int
 	.word	Object.abort
 	.word	IO.out_int
-	.word	Object.copy
-Int_dispTab:
 	.word	Object.type_name
+	.word	IO.in_int
+	.word	IO.in_string
+	.word	Object.copy
+	.word	IO.out_string
+Int_dispTab:
 	.word	Object.abort
+	.word	Object.type_name
 	.word	Object.copy
 Bool_dispTab:
-	.word	Object.type_name
 	.word	Object.abort
+	.word	Object.type_name
 	.word	Object.copy
 String_dispTab:
+	.word	String.concat
+	.word	Object.abort
+	.word	String.substr
 	.word	String.length
 	.word	Object.type_name
-	.word	String.substr
-	.word	Object.abort
-	.word	String.concat
 	.word	Object.copy
 Main_dispTab:
-	.word	Object.type_name
 	.word	Object.abort
 	.word	Main.main
+	.word	Object.type_name
 	.word	Object.copy
 	.word	-1
 Object_protObj:
@@ -371,6 +371,21 @@ Main_init:
 	jr	$ra	
 #Entering Class
 #Entering Method
+Main.main:
+	sw	$fp 0($sp)
+	addiu	$sp $sp -4
+	sw	$s0 0($sp)
+	addiu	$sp $sp -4
+	sw	$ra 0($sp)
+	addiu	$sp $sp -4
+	addiu	$fp $sp 4
+	move	$s0 $a0
+	la	$a0 int_const0
+	lw	$ra 4($sp)
+	lw	$s0 8($sp)
+	lw	$fp 12($sp)
+	addiu	$sp $sp 12
+	jr	$ra	
 #ANN(COOLCLASS, "Object", "_no_class")
 #ANN(COOLMETHOD, "Object", "abort", "Object")
 #ANN(COOLMETHOD, "Object", "type_name", "String")
