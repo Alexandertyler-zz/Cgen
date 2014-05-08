@@ -454,7 +454,7 @@ class method extends Feature {
         for (int iter = 0; iter < formals.getLength(); iter++) {
                     formal curr_formal = (formal) formals.getNth(iter);
                     sTable.addID(curr_formal.name, "" + (4*(formals.getLength() - iter) + 8) + "($fp)");
-                }
+        }
         expr.code();
 
         CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
@@ -636,6 +636,8 @@ class assign extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        expr.code(s, curr_class, cgTable, sTable);
+
     }
 
 
