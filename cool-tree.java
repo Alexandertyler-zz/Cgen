@@ -589,6 +589,10 @@ class branch extends Case {
 	expr.dump_with_types(out, n + 2);
     }
 
+    public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        expr.code(s, curr_class, cgTable, sTable);
+    }
+
 }
 
 
