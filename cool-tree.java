@@ -1730,9 +1730,10 @@ class object extends Expression {
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         if (name != TreeConstants.self) {
             if (sTable.lookup(name) != null) {
-	    	CgenSupport.emitLoad(CgenSupport.ACC, sTable.lookup(name), s);
+	    	CgenSupport.emitLoadAddress(CgenSupport.ACC, (String) sTable.lookup(name), s);
 	    } else {
 		s.println("___");
+            }
         } else {
             CgenSupport.emitMove(CgenSupport.ACC, CgenSupport.SELF, s);
         }
