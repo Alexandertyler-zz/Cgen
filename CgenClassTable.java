@@ -617,7 +617,7 @@ class CgenClassTable extends SymbolTable {
             CgenSupport.emitStore(CgenSupport.FP, 3, CgenSupport.SP, str);
             CgenSupport.emitStore(CgenSupport.SELF, 2, CgenSupport.SP, str);
             CgenSupport.emitStore(CgenSupport.RA, 1, CgenSupport.SP, str);
-            CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 4, str);
+            CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 12, str);
             CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, str);
             
             //get parent node
