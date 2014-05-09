@@ -172,7 +172,7 @@ class CgenClassTable extends SymbolTable {
     private void codeClass_NameObjectDispatch_Tables() {
         
         //Code the Name Table
-        str.print(CgenSupport.CLASSNAMETAB + CgenSupport.LABEL + "\n");
+        str.print(CgenSupport.CLASSNAMETAB + ":\n");
         //str.print("#CLASS NAME TABLE:\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
@@ -183,7 +183,7 @@ class CgenClassTable extends SymbolTable {
         }
 
         //Code the Object Table
-        str.print(CgenSupport.CLASSOBJTAB + CgenSupport.LABEL + "\n");
+        str.print(CgenSupport.CLASSOBJTAB + ":\n");
         //str.print("#CLASS OBJECT TABLE\n");
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
