@@ -446,20 +446,21 @@ class method extends Feature {
         CgenSupport.emitMethodRef(curr_class.getName(), name, s);
         s.print(CgenSupport.LABEL);
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -12, s);
-	CgenSupport.emitStore(CgenSupport.FP, 3, CgenSupport.SP, s);
-	CgenSupport.emitStore(CgenSupport.SELF, 2, CgenSupport.SP, s);
-	CgenSupport.emitStore(CgenSupport.RA, 1, CgenSupport.SP, s);
-	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 16, s);
+    	CgenSupport.emitStore(CgenSupport.FP, 3, CgenSupport.SP, s);
+    	CgenSupport.emitStore(CgenSupport.SELF, 2, CgenSupport.SP, s);
+    	CgenSupport.emitStore(CgenSupport.RA, 1, CgenSupport.SP, s);
+    	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 16, s);
         CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
         
         for (int iter = 0; iter < formals.getLength(); iter++) {
-                    formalc curr_formal = (formalc) formals.getNth(iter);
-                    sTable.addId(curr_formal.name, ("" + (4*(formals.getLength() - iter) + 8) + "($fp)"));
+            formalc curr_formal = (formalc) formals.getNth(iter);
+            sTable.addId(curr_formal.name, ("" + (4*(formals.getLength() - iter) + 8) + "($fp)"));
         }
 
-	s.println("#Before expr.code");
+    	s.println("#Before expr.code");
+        cgTable.zeroExprOffset();
         expr.code(s, curr_class, cgTable, sTable);
-	s.println("#After expr.code");
+    	s.println("#After expr.code");
 
         CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
@@ -991,6 +992,53 @@ class typcase extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+        sTable.enterScope();
+
+        ArrayList<branch> branchList = new ArrayList<branch>();
+        for (Enumeration e = cases.getElements(); e.hasMoreElements(); ) {
+            branch curr_branch = (branch) e.nextElement();
+            branchList.add(curr_branch);
+        }
+
+        //sort branches?
+
+        expr.code(s, curr_class, cgTable, sTable);
+        CgenSupport.emitPush(CgenSupport.ACC, s);
+        cgTable.decExprOffset();
+
+        int label = cgTable.getLabelNum();
+        CgenSupport.emitBne(CgenSupport.Acc, CgenSupport.ZERO, label, s);
+
+        s.print(CgenSupport.LA + CgenSupport.ACC + "\t");
+        ((StringSymbol) AbstractTable.stringtable.lookup(curr_class.getFilename().getString())).codeRef(s);
+        s.println();
+        CgenSupport.emitLoadImm(CgenSupport.T1, lineNumber, s);
+        CgenSupport.emitJal("_case_abort2", s);
+        CgenSupport.emitLabelDef(label, s);
+        CgenSupport.emitLoad(CgenSupport.T2, 0, CgenSupport.ACC, s);
+        int nextLabel = cgTable.getLabelNum();
+        for (int iter = 0; iter<branchList.size(); iter++) {
+            branch curr_branch = (branch) branchList.get(iter);
+            s.enterScope();
+            int classTag = cgTable.getClassInfo(b.type_decl).classTag;
+            int innerLabel = cgTable.getLabelNum();
+            int maxTag = cgTable.getMaxTag(b.type_decl);
+
+            CgenSupport.emitBlti(CgenSupport.T2, classTag, innerLabel, s);
+            CgenSupport.emitBgti(CgenSupport.T2, maxTag, innerLabel, s);
+            sTable.addId(curr_branch.name, cgTable.getExprOffset + "($fp)");
+            curr_branch.code(s, curr_class, cgTable, sTable);
+            CgenSupport.emitPop(s);
+            CgenSupport.emitBranch(nextLabel, s);
+            CgenSupport.emitLabelDef(innerLabel, s);
+            sTable.exitScope();
+        }
+
+        CgenSupport.emitJal("_case_abort", s);
+        CgenSupport.emitLabelDef(nextLabel, s);
+        cgTable.incExprOffset();
+        sTable.exitScope();
+
     }
 
 

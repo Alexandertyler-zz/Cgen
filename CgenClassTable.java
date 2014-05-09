@@ -54,12 +54,19 @@ class CgenClassTable extends SymbolTable {
 		public CgenNode node;
 		public ArrayList<attr> attributes;
 		public LinkedHashMap<method, CgenNode> methods;
+		public int offset = 0;
 		ClassInfo(CgenNode n) {
 			classTag = getNextClassTag();
 			node = n;
 			attributes = new ArrayList<attr>();
 			methods = new LinkedHashMap<method, CgenNode>();
 		}
+	}
+
+	public int getMaxTag(AbstractSymbol curr_class) {
+    	ClassInfo curr_class_info = class_ToClassInfo.get(curr_class);
+    	int maxTag = curr_class_info.classTag;
+    	
 	}
 		
     private HashMap<AbstractSymbol, ClassInfo> class_ToClassInfo = new HashMap<AbstractSymbol, ClassInfo>();
@@ -71,6 +78,11 @@ class CgenClassTable extends SymbolTable {
 		}
 		return null;
 		
+    }
+
+    public ClassInfo getClassInfo(AbstractSymbol curr_class) {
+    	ClassInfo curr_class_info = class_ToClassInfo.get(curr_class);
+    	return curr_class_info;
     }
 	
     private int labelNum = -1;
@@ -88,6 +100,9 @@ class CgenClassTable extends SymbolTable {
     }
     public void decExprOffset() {
         exprOffset -= 4;
+    }
+    public void zeroExprOffset() {
+    	exprOffset = 0;
     }
     public int methodOffset(AbstractSymbol className, AbstractSymbol methodName) {
         ClassInfo curr_nodeCI = class_ToClassInfo.get(className);
