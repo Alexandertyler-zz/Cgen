@@ -212,16 +212,16 @@ class_objTab
 	.word	Main_protObj
 	.word	Main_init
 Object_dispTab:
-	.word	Object.type_name
 	.word	Object.copy
+	.word	Object.type_name
 	.word	Object.abort
 IO_dispTab:
-	.word	Object.type_name
-	.word	IO.in_int
-	.word	IO.in_string
-	.word	Object.copy
 	.word	IO.out_int
+	.word	IO.in_int
 	.word	IO.out_string
+	.word	IO.in_string
+	.word	Object.type_name
+	.word	Object.copy
 	.word	Object.abort
 Int_dispTab:
 	.word	Object.type_name
@@ -232,12 +232,12 @@ Bool_dispTab:
 	.word	Object.copy
 	.word	Object.abort
 String_dispTab:
-	.word	Object.type_name
-	.word	String.length
 	.word	String.substr
+	.word	Object.type_name
 	.word	Object.copy
-	.word	Object.abort
 	.word	String.concat
+	.word	Object.abort
+	.word	String.length
 Main_dispTab:
 	.word	Main.main
 	.word	Object.type_name

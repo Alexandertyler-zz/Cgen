@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Stack;
 import java.util.Collections;
@@ -52,12 +53,12 @@ class CgenClassTable extends SymbolTable {
 		public int classTag;
 		public CgenNode node;
 		public ArrayList<attr> attributes;
-		public HashMap<method, CgenNode> methods;
+		public LinkedHashMap<method, CgenNode> methods;
 		ClassInfo(CgenNode n) {
 			classTag = getNextClassTag();
 			node = n;
 			attributes = new ArrayList<attr>();
-			methods = new HashMap<method, CgenNode>();
+			methods = new LinkedHashMap<method, CgenNode>();
 		}
 	}
 		
@@ -78,53 +79,74 @@ class CgenClassTable extends SymbolTable {
         labelNum++;
         return labelNum;
     }
-	
-	private void populateClass_ToClassInfo() {
-		for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
-			CgenNode n = (CgenNode) e.nextElement();
-			class_ToClassInfo.put(n.getName(), new ClassInfo(n));
-		}
-	}
-	
-	private void populateFeatures() {
-		//step through all children using stack
-		Stack<CgenNode> stack = new Stack<CgenNode>();
-		stack.push(root());
-		while(!stack.isEmpty()) {
-			CgenNode currNode = (CgenNode) stack.pop();
-			CgenNode parent = currNode.getParentNd();
-			ClassInfo currNdInfo = class_ToClassInfo.get(currNode.getName());
-			
-			//if not Object, add parent methods
-			if (parent.getName() != TreeConstants.No_class) {
-				ClassInfo parentInfo = class_ToClassInfo.get(parent.getName());
-				for (Enumeration e = Collections.enumeration(parentInfo.attributes); e.hasMoreElements(); ) {
-					currNdInfo.attributes.add((attr) e);
-				}
-            			for (method m : parentInfo.methods.keySet()) {
-					currNdInfo.methods.put(m, parentInfo.methods.get(m));
-				}
-			}
-			
-			//add current features
-			for (Enumeration e = currNode.getFeatures().getElements(); e.hasMoreElements(); ) {
-				Object currFeat = e.nextElement();
-				if (currFeat instanceof attr) {
-					currNdInfo.attributes.add((attr) currFeat);
-				}
-				if (currFeat instanceof method) {
-					currNdInfo.methods.put((method) currFeat, currNode);
-				}
-			}
-
-			//add remaining children
-			for (Enumeration e = currNode.getChildren(); e.hasMoreElements(); ) {
-                		CgenNode child = (CgenNode)e.nextElement();
-                		stack.push(child);
-            		}
-		}
-	}
-
+    private int exprOffset = 0;
+    public int getExprOffset() {
+        return exprOffset;
+    }
+    public void incExprOffset() {
+        exprOffset += 4;
+    }
+    public void decExprOffset() {
+        exprOffset -= 4;
+    }
+    public int methodOffset(AbstractSymbol className, AbstractSymbol methodName) {
+        ClassInfo curr_nodeCI = class_ToClassInfo.get(className);
+        int i = 0;
+        for (method currMethod : curr_nodeCI.methods.keySet()) {
+            if (methodName == currMethod.name) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+    
+    private void populateClass_ToClassInfo() {
+        for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
+            CgenNode n = (CgenNode) e.nextElement();
+            class_ToClassInfo.put(n.getName(), new ClassInfo(n));
+        }
+    }
+    
+    private void populateFeatures() {
+        //step through all children using stack
+        Stack<CgenNode> stack = new Stack<CgenNode>();
+        stack.push(root());
+        while(!stack.isEmpty()) {
+            CgenNode currNode = (CgenNode) stack.pop();
+            CgenNode parent = currNode.getParentNd();
+            ClassInfo currNdInfo = class_ToClassInfo.get(currNode.getName());
+            
+            //if not Object, add parent methods
+            if (parent.getName() != TreeConstants.No_class) {
+                ClassInfo parentInfo = class_ToClassInfo.get(parent.getName());
+                for (Enumeration e = Collections.enumeration(parentInfo.attributes); e.hasMoreElements(); ) {
+                    currNdInfo.attributes.add((attr) e);
+                }
+                for (method m : parentInfo.methods.keySet()) {
+                    currNdInfo.methods.put(m, parentInfo.methods.get(m));
+                }
+            }
+            
+            //add current features
+            for (Enumeration e = currNode.getFeatures().getElements(); e.hasMoreElements(); ) {
+                Object currFeat = e.nextElement();
+                if (currFeat instanceof attr) {
+                    currNdInfo.attributes.add((attr) currFeat);
+                }
+                if (currFeat instanceof method) {
+                    currNdInfo.methods.put((method) currFeat, currNode);
+                }
+            }
+            
+            //add remaining children
+            for (Enumeration e = currNode.getChildren(); e.hasMoreElements(); ) {
+                CgenNode child = (CgenNode)e.nextElement();
+                stack.push(child);
+            }
+        }
+    }
+    
     private void codeClass_NameObjectDispatch_Tables() {
         
         //Code the Name Table
