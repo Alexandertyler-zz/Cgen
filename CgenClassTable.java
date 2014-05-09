@@ -66,7 +66,7 @@ class CgenClassTable extends SymbolTable {
 	public int getMaxTag(AbstractSymbol curr_class) {
     	ClassInfo curr_class_info = class_ToClassInfo.get(curr_class);
     	int maxTag = curr_class_info.classTag;
-    	
+        return maxTag;	
 	}
 		
     private HashMap<AbstractSymbol, ClassInfo> class_ToClassInfo = new HashMap<AbstractSymbol, ClassInfo>();
