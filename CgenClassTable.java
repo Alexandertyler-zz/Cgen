@@ -64,9 +64,16 @@ class CgenClassTable extends SymbolTable {
 	}
 
 	public int getMaxTag(AbstractSymbol curr_class) {
-    	ClassInfo curr_class_info = class_ToClassInfo.get(curr_class);
-    	int maxTag = curr_class_info.classTag;
-        return maxTag;	
+    	    ClassInfo curr_class_info = class_ToClassInfo.get(curr_class);
+    	    int maxTag = curr_class_info.classTag;
+            for (Enumeration e = curr_class_info.node.getChildren(); e.hasMoreElements(); ) {
+	        CgenNode child_node = (CgenNode) e.nextElement();
+	        int newMax = getMaxTag(child_node.getName());
+	        if (maxTag < newMax) {
+	            maxTag = newMax;
+	        }
+	    }
+	    return maxTag;
 	}
 		
     private HashMap<AbstractSymbol, ClassInfo> class_ToClassInfo = new HashMap<AbstractSymbol, ClassInfo>();

@@ -706,7 +706,8 @@ class static_dispatch extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        int numActuals = actual.getLength();
+        s.println("#static_dispatch");
+	int numActuals = actual.getLength();
         for (int i  = 0; i < numActuals; i++) {
             Expression curr_expr = (Expression) actual.getNth(i);
             curr_expr.code(s, curr_class, cgTable, sTable);
@@ -717,7 +718,7 @@ class static_dispatch extends Expression {
         expr.code(s, curr_class, cgTable, sTable);
         int nextLabel = cgTable.getLabelNum();
         CgenSupport.emitBne(CgenSupport.ACC, CgenSupport.ZERO, nextLabel, s);
-        CgenSupport.emitLoadAddress(CgenSupport.ACC, "\t", s);
+        s.print(CgenSupport.LA + CgenSupport.ACC + " ");
         ((StringSymbol) AbstractTable.stringtable.lookup(curr_class.getFilename().getString())).codeRef(s);
         s.println();
         CgenSupport.emitLoadImm(CgenSupport.T1, lineNumber, s);
@@ -789,7 +790,8 @@ class dispatch extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        int numActuals = actual.getLength();
+        s.println("#dispatch");
+	int numActuals = actual.getLength();
         for (int i  = 0; i < numActuals; i++) {
             Expression curr_expr = (Expression) actual.getNth(i);
             curr_expr.code(s, curr_class, cgTable, sTable);
@@ -800,7 +802,9 @@ class dispatch extends Expression {
         expr.code(s, curr_class, cgTable, sTable);
         int nextLabel = cgTable.getLabelNum();
         CgenSupport.emitBne(CgenSupport.ACC, CgenSupport.ZERO, nextLabel, s);
-        CgenSupport.emitLoadAddress(CgenSupport.ACC, "\t", s);
+        
+	//s.println("#spacing error");
+	s.print(CgenSupport.LA + CgenSupport.ACC + " ");
         ((StringSymbol) AbstractTable.stringtable.lookup(curr_class.getFilename().getString())).codeRef(s);
         s.println();
         CgenSupport.emitLoadImm(CgenSupport.T1, lineNumber, s);
@@ -992,7 +996,8 @@ class typcase extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        sTable.enterScope();
+        s.println("#typcase");
+	sTable.enterScope();
 
         ArrayList<branch> branchList = new ArrayList<branch>();
         for (Enumeration e = cases.getElements(); e.hasMoreElements(); ) {
@@ -1007,11 +1012,12 @@ class typcase extends Expression {
         cgTable.decExprOffset();
 
         int label = cgTable.getLabelNum();
-        CgenSupport.emitBne(CgenSupport.Acc, CgenSupport.ZERO, label, s);
-
-        s.print(CgenSupport.LA + CgenSupport.ACC + "\t");
-        ((StringSymbol) AbstractTable.stringtable.lookup(curr_class.getFilename().getString())).codeRef(s);
-        s.println();
+        CgenSupport.emitBne(CgenSupport.ACC, CgenSupport.ZERO, label, s);
+        s.print(CgenSupport.LA + CgenSupport.ACC + " ");
+	//s.println("#checking");
+	((StringSymbol) AbstractTable.stringtable.lookup(curr_class.getFilename().getString())).codeRef(s);
+	s.println();
+        
         CgenSupport.emitLoadImm(CgenSupport.T1, lineNumber, s);
         CgenSupport.emitJal("_case_abort2", s);
         CgenSupport.emitLabelDef(label, s);
@@ -1019,16 +1025,18 @@ class typcase extends Expression {
         int nextLabel = cgTable.getLabelNum();
         for (int iter = 0; iter<branchList.size(); iter++) {
             branch curr_branch = (branch) branchList.get(iter);
-            s.enterScope();
-            int classTag = cgTable.getClassInfo(b.type_decl).classTag;
+            sTable.enterScope();
+            int classTag = cgTable.getClassInfo(curr_branch.type_decl).classTag;
             int innerLabel = cgTable.getLabelNum();
-            int maxTag = cgTable.getMaxTag(b.type_decl);
+            int maxTag = cgTable.getMaxTag(curr_branch.type_decl);
 
             CgenSupport.emitBlti(CgenSupport.T2, classTag, innerLabel, s);
             CgenSupport.emitBgti(CgenSupport.T2, maxTag, innerLabel, s);
-            sTable.addId(curr_branch.name, cgTable.getExprOffset + "($fp)");
+            sTable.addId(curr_branch.name, cgTable.getExprOffset() + "($fp)");
             curr_branch.code(s, curr_class, cgTable, sTable);
-            CgenSupport.emitPop(s);
+            
+	    CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
+
             CgenSupport.emitBranch(nextLabel, s);
             CgenSupport.emitLabelDef(innerLabel, s);
             sTable.exitScope();
@@ -1427,7 +1435,8 @@ class neg extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        e1.code(s, curr_class, cgTable, sTable);
+        s.println("#neg");
+	e1.code(s, curr_class, cgTable, sTable);
         
         CgenSupport.emitJal("Object.copy", s);
         
@@ -1478,7 +1487,8 @@ class lt extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        e1.code(s, curr_class, cgTable, sTable); 
+        s.println("#lt");
+	e1.code(s, curr_class, cgTable, sTable); 
         CgenSupport.emitStore(CgenSupport.ACC, 0, CgenSupport.SP, s);
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -4, s);
         
@@ -1548,7 +1558,8 @@ class eq extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        e1.code(s, curr_class, cgTable, sTable);
+        s.println("#eq");
+	e1.code(s, curr_class, cgTable, sTable);
         CgenSupport.emitStore(CgenSupport.ACC, 0, CgenSupport.SP, s);
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -4, s);
         
@@ -1616,7 +1627,8 @@ class leq extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        e1.code(s, curr_class, cgTable, sTable); 
+        s.println("#leq");
+	e1.code(s, curr_class, cgTable, sTable); 
         CgenSupport.emitStore(CgenSupport.ACC, 0, CgenSupport.SP, s);
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -4, s);
         
@@ -1682,7 +1694,8 @@ class comp extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        int label = cgTable.getLabelNum();
+        s.println("#comp");
+	int label = cgTable.getLabelNum();
         e1.code(s, curr_class, cgTable, sTable);
         
         // lw $t1 12($a0)
@@ -1739,7 +1752,7 @@ class int_const extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-
+	s.println("#int const");
 	CgenSupport.emitLoadInt(CgenSupport.ACC,
                                 (IntSymbol)AbstractTable.inttable.lookup(token.getString()), s);
     }
@@ -1781,7 +1794,7 @@ class bool_const extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-   
+  	s.println("bool_const"); 
 	CgenSupport.emitLoadBool(CgenSupport.ACC, new BoolConst(val), s);
     }
 
@@ -1824,6 +1837,7 @@ class string_const extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+	s.println("#string_const");
 	CgenSupport.emitLoadString(CgenSupport.ACC,
                                    (StringSymbol)AbstractTable.stringtable.lookup(token.getString()), s);
     }
@@ -1866,6 +1880,7 @@ class new_ extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
+    	s.println("#new_");
         if (type_name != TreeConstants.SELF_TYPE) {
 	    CgenSupport.emitLoadAddress(CgenSupport.ACC, type_name.getString() + CgenSupport.PROTOBJ_SUFFIX, s);
 	    CgenSupport.emitJal("Object.copy", s);
@@ -1926,7 +1941,8 @@ class isvoid extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        int label = cgTable.getLabelNum();
+        s.println("#isvoid");
+	int label = cgTable.getLabelNum();
        
         e1.code(s, curr_class, cgTable, sTable);
         
@@ -1978,7 +1994,8 @@ class no_expr extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        CgenSupport.emitLoadImm(CgenSupport.ACC, 0, s);          
+        s.println("#no_expr");
+	CgenSupport.emitLoadImm(CgenSupport.ACC, 0, s);          
     }
 
 
@@ -2020,7 +2037,8 @@ class object extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        if (name != TreeConstants.self) {
+        s.println("#Object");
+	if (name != TreeConstants.self) {
             if (sTable.lookup(name) != null) {
 	    	CgenSupport.emitLoadAddress(CgenSupport.ACC, (String) sTable.lookup(name), s);
 	    } else {
