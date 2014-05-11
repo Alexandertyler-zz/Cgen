@@ -443,28 +443,28 @@ class method extends Feature {
 
         sTable.enterScope();
 
-        CgenSupport.emitMethodRef(curr_class.getName(), name, s);
-        s.print(CgenSupport.LABEL);
-        CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -12, s);
-    	CgenSupport.emitStore(CgenSupport.FP, 3, CgenSupport.SP, s);
-    	CgenSupport.emitStore(CgenSupport.SELF, 2, CgenSupport.SP, s);
-    	CgenSupport.emitStore(CgenSupport.RA, 1, CgenSupport.SP, s);
-    	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 16, s);
-        CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
-        
         for (int iter = 0; iter < formals.getLength(); iter++) {
             formalc curr_formal = (formalc) formals.getNth(iter);
             sTable.addId(curr_formal.name, ("" + (4*(formals.getLength() - iter) + 8) + "($fp)"));
         }
+
+	CgenSupport.emitMethodRef(curr_class.getName(), name, s);
+        s.print(CgenSupport.LABEL);
+        CgenSupport.emitPush(CgenSupport.FP, s);
+    	CgenSupport.emitPush(CgenSupport.SELF, s);
+    	CgenSupport.emitPush(CgenSupport.RA, s);
+  	
+    	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 4, s);
+        CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
 
     	s.println("#Before expr.code");
         cgTable.zeroExprOffset();
         expr.code(s, curr_class, cgTable, sTable);
     	s.println("#After expr.code");
 
-        CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
-        CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
         CgenSupport.emitLoad(CgenSupport.FP, 3, CgenSupport.SP, s);
+        CgenSupport.emitLoad(CgenSupport.SELF, 2, CgenSupport.SP, s);
+        CgenSupport.emitLoad(CgenSupport.RA, 1, CgenSupport.SP, s);
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, (4*formals.getLength()+12), s);
         CgenSupport.emitReturn(s);
 
