@@ -1499,16 +1499,12 @@ class lt extends Expression {
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
         CgenSupport.emitLoad(CgenSupport.T1, 3, CgenSupport.T1, s);
         
-        CgenSupport.emitLoadAddress(CgenSupport.ACC, "\t", s);
-        BoolConst.truebool.codeRef(s);
-        s.println();
+        CgenSupport.emitLoadAddress(CgenSupport.ACC, "bool_const1", s);
         
         int label = cgTable.getLabelNum();
         CgenSupport.emitBlt(CgenSupport.T1, CgenSupport.T2, label, s);
         
-        CgenSupport.emitLoadAddress(CgenSupport.ACC, "\t", s);
-        BoolConst.falsebool.codeRef(s);
-        s.println();
+        CgenSupport.emitLoadAddress(CgenSupport.ACC, "bool_const0", s);
         
         CgenSupport.emitLabelRef(label, s);
         s.print(CgenSupport.LABEL);
@@ -1570,18 +1566,14 @@ class eq extends Expression {
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
         CgenSupport.emitMove(CgenSupport.T1, CgenSupport.ACC, s);
         
-        CgenSupport.emitLoadAddress(CgenSupport.ACC, "\t", s);
-        BoolConst.truebool.codeRef(s);
-        s.println();
+        CgenSupport.emitLoadAddress(CgenSupport.ACC, "bool_const1", s);
         
         int label = cgTable.getLabelNum();
         CgenSupport.emitBeq(CgenSupport.T1, CgenSupport.T2, label, s);
         
-        CgenSupport.emitLoadAddress(CgenSupport.A1, "\t", s);
-        BoolConst.falsebool.codeRef(s);
-        s.println();
+        CgenSupport.emitLoadAddress(CgenSupport.A1, "bool_const0", s);
         
-        CgenSupport.emitJal("eq_test", s);
+        CgenSupport.emitJal("equality_test", s);
         CgenSupport.emitLabelDef(label, s);
     }
 }
@@ -1639,16 +1631,12 @@ class leq extends Expression {
         CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
         CgenSupport.emitLoad(CgenSupport.T1, 3, CgenSupport.T1, s);
         
-        CgenSupport.emitLoadAddress(CgenSupport.ACC, "\t", s);
-        BoolConst.truebool.codeRef(s);
-        s.println();
+        CgenSupport.emitLoadAddress(CgenSupport.ACC, "bool_const1", s);
         
         int label = cgTable.getLabelNum();
         CgenSupport.emitBleq(CgenSupport.T1, CgenSupport.T2, label, s);
         
-        CgenSupport.emitLoadAddress(CgenSupport.ACC, "\t", s);
-        BoolConst.falsebool.codeRef(s);
-        s.println();
+        CgenSupport.emitLoadAddress(CgenSupport.ACC, "bool_const0", s);
         
         CgenSupport.emitLabelRef(label, s);
         s.print(CgenSupport.LABEL);
@@ -2040,7 +2028,8 @@ class object extends Expression {
         s.println("#Object");
 	if (name != TreeConstants.self) {
             if (sTable.lookup(name) != null) {
-	    	CgenSupport.emitLoadAddress(CgenSupport.ACC, (String) sTable.lookup(name), s);
+	    	//CgenSupport.emitLoadAddress(CgenSupport.ACC, (String) sTable.lookup(name), s);
+                CgenSupport.emitLoad(CgenSupport.ACC, 0, CgenSupport.FP, s);
 	    } else {
 		//error?
             }
