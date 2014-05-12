@@ -998,7 +998,7 @@ class typcase extends Expression {
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
         s.println("#typcase");
-	sTable.enterScope();
+	   sTable.enterScope();
 
         ArrayList<branch> branchList = new ArrayList<branch>();
         for (Enumeration e = cases.getElements(); e.hasMoreElements(); ) {
@@ -1006,38 +1006,35 @@ class typcase extends Expression {
             branchList.add(curr_branch);
         }
 
-        //sort branches?
-
         expr.code(s, curr_class, cgTable, sTable);
         CgenSupport.emitPush(CgenSupport.ACC, s);
         cgTable.decExprOffset();
 
         int label = cgTable.getLabelNum();
+        int nextLabel = cgTable.getLabelNum();
+
         CgenSupport.emitBne(CgenSupport.ACC, CgenSupport.ZERO, label, s);
         s.print(CgenSupport.LA + CgenSupport.ACC + " ");
-	//s.println("#checking");
-	((StringSymbol) AbstractTable.stringtable.lookup(curr_class.getFilename().getString())).codeRef(s);
-	s.println();
-        
-        CgenSupport.emitLoadImm(CgenSupport.T1, lineNumber, s);
+	    //s.println("#checking");
+	    ((StringSymbol) AbstractTable.stringtable.lookup(curr_class.getFilename().getString())).codeRef(s);
+	    s.println();
+        s.println(CgenSupport.LI + CgenSupport.T1 + " " + lineNumber);
         CgenSupport.emitJal("_case_abort2", s);
         CgenSupport.emitLabelDef(label, s);
         CgenSupport.emitLoad(CgenSupport.T2, 0, CgenSupport.ACC, s);
-        int nextLabel = cgTable.getLabelNum();
+        
         for (int iter = 0; iter<branchList.size(); iter++) {
             branch curr_branch = (branch) branchList.get(iter);
             sTable.enterScope();
             int classTag = cgTable.getClassInfo(curr_branch.type_decl).classTag;
             int innerLabel = cgTable.getLabelNum();
-            int maxTag = cgTable.getMaxTag(curr_branch.type_decl);
-
+            int maximumTag = cgTable.getMaxTag(curr_branch.type_decl);
             CgenSupport.emitBlti(CgenSupport.T2, classTag, innerLabel, s);
             CgenSupport.emitBgti(CgenSupport.T2, maxTag, innerLabel, s);
             sTable.addId(curr_branch.name, cgTable.getExprOffset() + "($fp)");
             curr_branch.code(s, curr_class, cgTable, sTable);
             
-	    CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
-
+	       CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
             CgenSupport.emitBranch(nextLabel, s);
             CgenSupport.emitLabelDef(innerLabel, s);
             sTable.exitScope();
@@ -1872,24 +1869,24 @@ class new_ extends Expression {
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
     	s.println("#new_");
         if (type_name != TreeConstants.SELF_TYPE) {
-	    CgenSupport.emitLoadAddress(CgenSupport.ACC, type_name.getString() + CgenSupport.PROTOBJ_SUFFIX, s);
-	    CgenSupport.emitJal("Object.copy", s);
-	    CgenSupport.emitJal(type_name.getString() + CgenSupport.CLASSINIT_SUFFIX, s);
-	} else {
-	    CgenSupport.emitLoadAddress(CgenSupport.T1, "class_objTab", s);
-	    CgenSupport.emitLoad(CgenSupport.T2, 0, CgenSupport.SELF, s);
-	    CgenSupport.emitSll(CgenSupport.T2, CgenSupport.T2, 3, s);
-	    CgenSupport.emitAddu(CgenSupport.T1, CgenSupport.T1, CgenSupport.T2, s);
-	    
-	    CgenSupport.emitStore(CgenSupport.T1, 0, CgenSupport.T1, s);
-	    CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, -4, s);
-	    CgenSupport.emitLoad(CgenSupport.ACC, 0, CgenSupport.T1, s);
-	    CgenSupport.emitJal("Object.copy", s);
-	    CgenSupport.emitLoad(CgenSupport.T2, 1, CgenSupport.SP, s);
-	    CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
-	    CgenSupport.emitLoad(CgenSupport.T1, 1, CgenSupport.T2, s);
-	    CgenSupport.emitJalr(CgenSupport.T1, s);
-	}
+            s.println(CgenSupport.LA + type_name.getString() + CgenSupport.PROTOBJ_SUFFIX);
+    	    CgenSupport.emitJal("Object.copy", s);
+    	    CgenSupport.emitJal(type_name.getString() + CgenSupport.CLASSINIT_SUFFIX, s);
+	    } else {
+            s.println(CgenSupport.LA + CgenSupport.T1 + " class_objTab");
+    	    CgenSupport.emitLoad(CgenSupport.T2, 0, CgenSupport.SELF, s);
+    	    CgenSupport.emitSll(CgenSupport.T2, CgenSupport.T2, 3, s);
+    	    CgenSupport.emitAddu(CgenSupport.T1, CgenSupport.T1, CgenSupport.T2, s);
+    	    
+    	    CgenSupport.emitPush(CgenSupport.T1, s);
+    	    CgenSupport.emitLoad(CgenSupport.ACC, 0, CgenSupport.T1, s);
+    	    CgenSupport.emitJal("Object.copy", s);
+
+    	    CgenSupport.emitLoad(CgenSupport.T2, 1, CgenSupport.SP, s);
+    	    CgenSupport.emitAddiu(CgenSupport.SP, CgenSupport.SP, 4, s);
+    	    CgenSupport.emitLoad(CgenSupport.T1, 1, CgenSupport.T2, s);
+    	    CgenSupport.emitJalr(CgenSupport.T1, s);
+	   }
     }
 
 
