@@ -686,12 +686,9 @@ class CgenClassTable extends SymbolTable {
                     int offset = 3 + i;
                     CgenSupport.emitStore(CgenSupport.ACC, offset,
                                           CgenSupport.SELF, str);
+		  
                     
-                    if (Flags.cgen_Memmgr == Flags.GC_GENGC) {
-                        String loc = "" + offset*4 + "($s0)";
-                        CgenSupport.emitLoadAddress(CgenSupport.A1, loc, str);
-                        CgenSupport.emitJal("_GenGC_Assign", str);
-                    }
+                   
                 }
             }
 

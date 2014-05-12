@@ -25,24 +25,24 @@ _MemMgr_COLLECTOR:
 _MemMgr_TEST:
 	.word	0
 	.word	-1
-str_const12:
+str_const15:
 	.word	4
 	.word	5
 	.word	String_dispTab
-	.word	int_const14
+	.word	int_const0
 	.byte	0	
 	.align	2
 	.word	-1
-str_const11:
+str_const14:
 	.word	4
 	.word	6
 	.word	String_dispTab
-	.word	int_const3
+	.word	int_const4
 	.ascii	"Main"
 	.byte	0	
 	.align	2
 	.word	-1
-str_const10:
+str_const13:
 	.word	4
 	.word	6
 	.word	String_dispTab
@@ -51,25 +51,25 @@ str_const10:
 	.byte	0	
 	.align	2
 	.word	-1
-str_const9:
+str_const12:
 	.word	4
 	.word	6
 	.word	String_dispTab
-	.word	int_const3
+	.word	int_const4
 	.ascii	"Bool"
 	.byte	0	
 	.align	2
 	.word	-1
-str_const8:
+str_const11:
 	.word	4
 	.word	5
 	.word	String_dispTab
-	.word	int_const2
+	.word	int_const6
 	.ascii	"Int"
 	.byte	0	
 	.align	2
 	.word	-1
-str_const7:
+str_const10:
 	.word	4
 	.word	5
 	.word	String_dispTab
@@ -78,7 +78,7 @@ str_const7:
 	.byte	0	
 	.align	2
 	.word	-1
-str_const6:
+str_const9:
 	.word	4
 	.word	6
 	.word	String_dispTab
@@ -87,16 +87,16 @@ str_const6:
 	.byte	0	
 	.align	2
 	.word	-1
-str_const5:
+str_const8:
 	.word	4
 	.word	7
 	.word	String_dispTab
-	.word	int_const9
+	.word	int_const7
 	.ascii	"_prim_slot"
 	.byte	0	
 	.align	2
 	.word	-1
-str_const4:
+str_const7:
 	.word	4
 	.word	7
 	.word	String_dispTab
@@ -105,7 +105,7 @@ str_const4:
 	.byte	0	
 	.align	2
 	.word	-1
-str_const3:
+str_const6:
 	.word	4
 	.word	7
 	.word	String_dispTab
@@ -114,21 +114,48 @@ str_const3:
 	.byte	0	
 	.align	2
 	.word	-1
-str_const2:
+str_const5:
 	.word	4
 	.word	8
 	.word	String_dispTab
-	.word	int_const12
+	.word	int_const9
 	.ascii	"<basic class>"
+	.byte	0	
+	.align	2
+	.word	-1
+str_const4:
+	.word	4
+	.word	7
+	.word	String_dispTab
+	.word	int_const10
+	.ascii	"continue"
+	.byte	0	
+	.align	2
+	.word	-1
+str_const3:
+	.word	4
+	.word	6
+	.word	String_dispTab
+	.word	int_const4
+	.ascii	"halt"
+	.byte	0	
+	.align	2
+	.word	-1
+str_const2:
+	.word	4
+	.word	7
+	.word	String_dispTab
+	.word	int_const11
+	.ascii	" is prime.\n"
 	.byte	0	
 	.align	2
 	.word	-1
 str_const1:
 	.word	4
-	.word	5
+	.word	10
 	.word	String_dispTab
-	.word	int_const0
-	.ascii	"\n"
+	.word	int_const12
+	.ascii	"2 is trivially prime.\n"
 	.byte	0	
 	.align	2
 	.word	-1
@@ -136,46 +163,34 @@ str_const0:
 	.word	4
 	.word	7
 	.word	String_dispTab
-	.word	int_const9
-	.ascii	"tests/3.cl"
+	.word	int_const7
+	.ascii	"tests/6.cl"
 	.byte	0	
 	.align	2
-	.word	-1
-int_const14:
-	.word	2
-	.word	4
-	.word	Int_dispTab
-	.word	0
-	.word	-1
-int_const13:
-	.word	2
-	.word	4
-	.word	Int_dispTab
-	.word	14
 	.word	-1
 int_const12:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	13
+	.word	22
 	.word	-1
 int_const11:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	12
+	.word	11
 	.word	-1
 int_const10:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	11
+	.word	8
 	.word	-1
 int_const9:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	10
+	.word	13
 	.word	-1
 int_const8:
 	.word	2
@@ -187,13 +202,13 @@ int_const7:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	8
+	.word	10
 	.word	-1
 int_const6:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	7
+	.word	3
 	.word	-1
 int_const5:
 	.word	2
@@ -205,19 +220,19 @@ int_const4:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	5
+	.word	4
 	.word	-1
 int_const3:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	4
+	.word	1
 	.word	-1
 int_const2:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	3
+	.word	500
 	.word	-1
 int_const1:
 	.word	2
@@ -229,7 +244,7 @@ int_const0:
 	.word	2
 	.word	4
 	.word	Int_dispTab
-	.word	1
+	.word	0
 	.word	-1
 bool_const0:
 	.word	3
@@ -243,12 +258,12 @@ bool_const1:
 	.word	Bool_dispTab
 	.word	1
 class_nameTab:
-	.word	str_const6
-	.word	str_const7
-	.word	str_const8
 	.word	str_const9
 	.word	str_const10
 	.word	str_const11
+	.word	str_const12
+	.word	str_const13
+	.word	str_const14
 class_objTab:
 	.word	Object_protObj
 	.word	Object_init
@@ -297,7 +312,6 @@ Main_dispTab:
 	.word	IO.out_int
 	.word	IO.in_string
 	.word	IO.in_int
-	.word	Main.recite
 	.word	Main.main
 	.word	-1
 Object_protObj:
@@ -326,13 +340,18 @@ String_protObj:
 	.word	4
 	.word	5
 	.word	String_dispTab
-	.word	int_const14
+	.word	int_const0
 	.word	0
 	.word	-1
 Main_protObj:
 	.word	5
-	.word	3
+	.word	8
 	.word	Main_dispTab
+	.word	int_const0
+	.word	int_const0
+	.word	int_const0
+	.word	int_const0
+	.word	0
 	.globl	heap_start
 heap_start:
 	.word	0
@@ -419,6 +438,10 @@ Main_init:
 	addiu	$fp $sp 16
 	move	$s0 $a0
 	jal	IO_init
+	sw		.word	0 12($s0)
+	sw		.word	0 16($s0)
+	sw		.word	0 24($s0)
+	sw		.word	0 28($s0)
 	move	$a0 $s0
 	lw	$fp 12($sp)
 	lw	$s0 8($sp)
@@ -426,55 +449,6 @@ Main_init:
 	addiu	$sp $sp 12
 	jr	$ra	
 #Entering Class
-#Entering Method
-Main.recite:
-	sw	$fp 0($sp)
-	addiu	$sp $sp -4
-	sw	$s0 0($sp)
-	addiu	$sp $sp -4
-	sw	$ra 0($sp)
-	addiu	$sp $sp -4
-	addiu	$fp $sp 16
-	move	$s0 $a0
-#Before expr.code
-#dispatch
-#Object
-	lw	$a0 0($fp)
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label0
-	la	$a0 str_const0
-	li	$t1 9
-	jal	_dispatch_abort
-label0:
-	lw	$t1 8($a0)
-	lw	$t1 16($t1)
-	jalr	$t1
-#dispatch
-#string_const
-	la	$a0 str_const1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label1
-	la	$a0 str_const0
-	li	$t1 10
-	jal	_dispatch_abort
-label1:
-	lw	$t1 8($a0)
-	lw	$t1 12($t1)
-	jalr	$t1
-#Object
-	lw	$a0 0($fp)
-#After expr.code
-	lw	$fp 12($sp)
-	lw	$s0 8($sp)
-	lw	$ra 4($sp)
-	addiu	$sp $sp 16
-	jr	$ra	
 #Entering Method
 Main.main:
 	sw	$fp 0($sp)
@@ -486,286 +460,8 @@ Main.main:
 	addiu	$fp $sp 16
 	move	$s0 $a0
 #Before expr.code
-#dispatch
 #int const
 	la	$a0 int_const0
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label2
-	la	$a0 str_const0
-	li	$t1 18
-	jal	_dispatch_abort
-label2:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#dispatch
-#int const
-	la	$a0 int_const1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label3
-	la	$a0 str_const0
-	li	$t1 18
-	jal	_dispatch_abort
-label3:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	jal	Object.copy
-	lw	$t2 12($a0)
-	lw	$t3 4($sp)
-	addiu	$sp $sp 4
-	lw	$t1 12($t3)
-	add	$t1 $t1 $t2
-	sw	$t1 12($a0)
-#dispatch
-#int const
-	la	$a0 int_const2
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label4
-	la	$a0 str_const0
-	li	$t1 19
-	jal	_dispatch_abort
-label4:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#dispatch
-#int const
-	la	$a0 int_const3
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label5
-	la	$a0 str_const0
-	li	$t1 19
-	jal	_dispatch_abort
-label5:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	jal	Object.copy
-	lw	$t2 12($a0)
-	lw	$t3 4($sp)
-	addiu	$sp $sp 4
-	lw	$t1 12($t3)
-	sub	$t1 $t1 $t2
-	sw	$t1 12($a0)
-#dispatch
-#int const
-	la	$a0 int_const4
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label6
-	la	$a0 str_const0
-	li	$t1 20
-	jal	_dispatch_abort
-label6:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#dispatch
-#int const
-	la	$a0 int_const5
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label7
-	la	$a0 str_const0
-	li	$t1 20
-	jal	_dispatch_abort
-label7:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	jal	Object.copy
-	lw	$t2 12($a0)
-	lw	$t3 4($sp)
-	addiu	$sp $sp 4
-	lw	$t1 12($t3)
-	mul	$t1 $t1 $t2
-	sw	$t1 12($a0)
-#dispatch
-#int const
-	la	$a0 int_const6
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label8
-	la	$a0 str_const0
-	li	$t1 21
-	jal	_dispatch_abort
-label8:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#dispatch
-#int const
-	la	$a0 int_const7
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label9
-	la	$a0 str_const0
-	li	$t1 21
-	jal	_dispatch_abort
-label9:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	jal	Object.copy
-	lw	$t2 12($a0)
-	lw	$t3 4($sp)
-	addiu	$sp $sp 4
-	lw	$t1 12($t3)
-	div	$t1 $t1 $t2
-	sw	$t1 12($a0)
-#lt
-#dispatch
-#int const
-	la	$a0 int_const8
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label10
-	la	$a0 str_const0
-	li	$t1 22
-	jal	_dispatch_abort
-label10:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#dispatch
-#int const
-	la	$a0 int_const9
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label11
-	la	$a0 str_const0
-	li	$t1 22
-	jal	_dispatch_abort
-label11:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	lw	$t2 12($a0)
-	lw	$t1 4($sp)
-	addiu	$sp $sp 4
-	lw	$t1 12($t1)
-	la	$a0 bool_const1
-	blt	$t1 $t2 label12
-	la	$a0 bool_const0
-label12:
-#eq
-#dispatch
-#int const
-	la	$a0 int_const10
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label13
-	la	$a0 str_const0
-	li	$t1 23
-	jal	_dispatch_abort
-label13:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#dispatch
-#int const
-	la	$a0 int_const11
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label14
-	la	$a0 str_const0
-	li	$t1 23
-	jal	_dispatch_abort
-label14:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	move	$t2 $a0
-	lw	$a0 4($sp)
-	addiu	$sp $sp 4
-	move	$t1 $a0
-	la	$a0 bool_const1
-	beq	$t1 $t2 label15
-	la	$a1 bool_const0
-	jal	equality_test
-label15:
-#leq
-#dispatch
-#int const
-	la	$a0 int_const12
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label16
-	la	$a0 str_const0
-	li	$t1 24
-	jal	_dispatch_abort
-label16:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#dispatch
-#int const
-	la	$a0 int_const13
-	sw	$a0 0($sp)
-	addiu	$sp $sp -4
-#Object
-	move	$a0 $s0
-	bne	$a0 $zero label17
-	la	$a0 str_const0
-	li	$t1 24
-	jal	_dispatch_abort
-label17:
-	lw	$t1 8($a0)
-	lw	$t1 28($t1)
-	jalr	$t1
-	lw	$t2 12($a0)
-	lw	$t1 4($sp)
-	addiu	$sp $sp 4
-	lw	$t1 12($t1)
-	la	$a0 bool_const1
-	ble	$t1 $t2 label18
-	la	$a0 bool_const0
-label18:
 #After expr.code
 	lw	$fp 12($sp)
 	lw	$s0 8($sp)
@@ -787,6 +483,5 @@ label18:
 #ANN(COOLMETHOD, "IO", "out_int", "Int", "SELF_TYPE")
 #ANN(COOLMETHOD, "IO", "in_string", "String")
 #ANN(COOLMETHOD, "IO", "in_int", "Int")
-#ANN(COOLCLASS, "Main","IO")
-  #ANN(COOLMETHOD, "Main", "recite", "Int", "Int")
-  #ANN(COOLMETHOD, "Main", "main", "Object")
+#ANN(COOLCLASS, "Main","IO", "Int", "Int", "Int", "Int", "Object")
+  #ANN(COOLMETHOD, "Main", "main", "Int")

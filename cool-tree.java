@@ -1148,8 +1148,9 @@ class let extends Expression {
       * @param s the output stream 
       * */
     public void code(PrintStream s, class_c curr_class, CgenClassTable cgTable, SymbolTable sTable) {
-        sTable.enterScope();
-        
+        s.println("#let");
+	sTable.enterScope();
+        s.println("#type_decl = " + type_decl.getString());
         if(init instanceof no_expr) {
             if(type_decl.getString().equals("Int")
                || type_decl.getString().equals("Bool")
