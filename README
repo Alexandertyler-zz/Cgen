@@ -4,3 +4,12 @@ Write-up for PA5
 ----------------
 Fuck this project.
 
+For this project we needed to extend our implementation in the previous project to
+include code generation. Like before, we began by making a ClassTable that would 
+both initialize our program and include starting code generation. It initialized
+and set up the base classes of int io bool object and string. We noticed that in order
+to make the proper inits in CgenTable we would need to store a bunch of information 
+about each class including its attributes, methods, class tag, a pointer to it's cgenNode
+an offset for it, and a method of getting the information given only a curr_class. This was
+stored in CgenTable but made available to  be looked up in cool-tree by calling the CgenTable
+that we initialized.
