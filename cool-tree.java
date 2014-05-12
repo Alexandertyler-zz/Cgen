@@ -450,11 +450,12 @@ class method extends Feature {
 
 	CgenSupport.emitMethodRef(curr_class.getName(), name, s);
         s.print(CgenSupport.LABEL);
+	
         CgenSupport.emitPush(CgenSupport.FP, s);
     	CgenSupport.emitPush(CgenSupport.SELF, s);
     	CgenSupport.emitPush(CgenSupport.RA, s);
   	
-    	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 4, s);
+    	CgenSupport.emitAddiu(CgenSupport.FP, CgenSupport.SP, 16, s);
         CgenSupport.emitMove(CgenSupport.SELF, CgenSupport.ACC, s);
 
     	s.println("#Before expr.code");
