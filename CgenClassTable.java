@@ -151,13 +151,14 @@ class CgenClassTable extends SymbolTable {
             }
             
             //add current features
+	    //overwrites because it should already be in there
             for (Enumeration e = currNode.getFeatures().getElements(); e.hasMoreElements(); ) {
                 Object currFeat = e.nextElement();
-                if (currFeat instanceof attr) {
-                    currNdInfo.attributes.add((attr) currFeat);
-                }
                 if (currFeat instanceof method) {
                     currNdInfo.methods.put((method) currFeat, currNode);
+                }
+                if (currFeat instanceof attr) {
+                    currNdInfo.attributes.add((attr) currFeat);
                 }
             }
             
@@ -590,7 +591,7 @@ class CgenClassTable extends SymbolTable {
 	//                   - class_nameTab
 	//                   - dispatch tables
 
-        codePrototypeObjects();
+        codePrototypeObjectsAndBasics();
 
 	if (Flags.cgen_debug) System.out.println("coding global text");
 	codeGlobalText();
@@ -602,34 +603,30 @@ class CgenClassTable extends SymbolTable {
         Initialize();
     }
 
-    public void codePrototypeObjects() {
+    public void codePrototypeObjectsAndBasics() {
         
         for (Enumeration e = nds.elements(); e.hasMoreElements(); ) {
             CgenNode curr_node = (CgenNode) e.nextElement();
             str.println(CgenSupport.WORD + "-1");
 
             ClassInfo curr_class = class_ToClassInfo.get(curr_node.getName());
-            str.print(curr_node.getName());
-            str.print(CgenSupport.PROTOBJ_SUFFIX + CgenSupport.LABEL);
+            str.print(curr_node.getName() + CgenSupport.PROTOBJ_SUFFIX + CgenSupport.LABEL);
             str.println(CgenSupport.WORD + curr_class.classTag);
-
             str.println(CgenSupport.WORD + (CgenSupport.DEFAULT_OBJFIELDS + curr_class.attributes.size()));
-
             str.println(CgenSupport.WORD + curr_node.getName() + CgenSupport.DISPTAB_SUFFIX);
 
             for (Enumeration e_att = Collections.enumeration(curr_class.attributes); e_att.hasMoreElements(); ) {
                 attr curr_attr = (attr) e_att.nextElement();
-                AbstractSymbol curr_type = curr_attr.type_decl;
                 str.print(CgenSupport.WORD);
-                if (curr_type == TreeConstants.Bool) {
+                if (curr_attr.type_decl == TreeConstants.Bool) {
                     BoolConst b = new BoolConst(false);
                     b.codeRef(str);
                 }
-                else if (curr_type == TreeConstants.Str) {
+                else if (curr_attr.type_decl == TreeConstants.Str) {
                     StringSymbol s = (StringSymbol) (AbstractTable.stringtable.lookup(""));
                     s.codeRef(str);
                 }
-                else if (curr_type == TreeConstants.Int) {
+                else if (curr_attr.type_decl == TreeConstants.Int) {
                     IntSymbol i = (IntSymbol) (AbstractTable.inttable.addInt(0));
                     i.codeRef(str);
                 }
