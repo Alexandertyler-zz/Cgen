@@ -2,14 +2,25 @@
 
 Write-up for PA5
 ----------------
-Fuck this project.
-
 For this project we needed to extend our implementation in the previous project to
 include code generation. Like before, we began by making a ClassTable that would 
 both initialize our program and include starting code generation. It initialized
 and set up the base classes of int io bool object and string. We noticed that in order
-to make the proper inits in CgenTable we would need to store a bunch of information 
-about each class including its attributes, methods, class tag, a pointer to it's cgenNode
+to make the proper initializations in CgenTable we would need to store a bunch of information 
+about each class including its attributes, methods, class tag, a pointer to it's cgenNode,
 an offset for it, and a method of getting the information given only a curr_class. This was
 stored in CgenTable but made available to  be looked up in cool-tree by calling the CgenTable
-that we initialized.
+that we initialized. We also needed to fill in code in the StringSymbol, IntSymbol, and 
+BoolConst classes to properly generate code for constants. 
+
+In the cool-tree file we wrote most of the actual code generation methods. Unfortunately, we
+did have enough time to properly debug the more difficult methods such as let and case. For the 
+most part, we compared output of the reference compiler on test files and tried to get ours to 
+match, except for a couple differences. For exaple, rather than reducing the stack pointer by the 
+required amount at the beginning of a method call, we'd use the "emitPush" method in CgenSupport to 
+store and reduce the stack pointer one at a time. 
+
+This was an extremeley difficult project, possibly the most difficult we've experienced at Berkeley.
+It is rare we are forced to turn in a project half complete (we only pass half the test cases), but
+we ultimately felt unable to finish, with finals looming. That said, we also learned a great
+amount about some of the intracacies of writing a compiler. 
